@@ -1,0 +1,8 @@
+.DS_Store
+packages
+_ReSharper.*
+*.user
+bin
+debug
+*.suo
+
