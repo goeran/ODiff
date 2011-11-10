@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Diff.cs" />
     <Compile Include="DiffReport.cs" />
+    <Compile Include="ObjectGraphDiff.cs" />
     <Compile Include="ReportTable.cs" />
     <Compile Include="DiffReportTableRow.cs" />
     <Compile Include="Extensions\PropertyInfoExtensions.cs" />
