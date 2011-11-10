@@ -14,7 +14,7 @@ namespace ODiff.Tests
                 var a = new Person {NameProperty = "Gøran"};
                 var b = new Person {NameProperty = "Gøran Hansen"};
 
-                Assert.IsTrue(Diff.Object(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
 
             [Test]
@@ -23,7 +23,7 @@ namespace ODiff.Tests
                 var a = new Person {NameAsField = "Steve"};
                 var b = new Person {NameAsField = "Bill"};
 
-                Assert.IsTrue(Diff.Object(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
 
             [Test]
@@ -32,7 +32,7 @@ namespace ODiff.Tests
                 var a = new Person {AgeAsProperty = 20};
                 var b = new Person {AgeAsProperty = 29};
 
-                Assert.IsTrue(Diff.Object(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
 
             [Test]
@@ -41,7 +41,7 @@ namespace ODiff.Tests
                 var a = new Person { AgeAsField = 20 };
                 var b = new Person { AgeAsField = 29 };
 
-                Assert.IsTrue(Diff.Object(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
 
             [Test]
@@ -50,7 +50,15 @@ namespace ODiff.Tests
                 var a = new Person {Assets = new List<object>()};
                 var b = new Person {Assets = new List<object>()};
 
-                Assert.IsFalse(Diff.Object(a, b).DiffFound);
+                Assert.IsFalse(Diff.ObjectValues(a, b).DiffFound);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_object_references_when_null()
+            {
+                var a = new Person {};
+                var b = new Person {Assets = new List<object>()};
+
             }
         }
 
@@ -65,7 +73,7 @@ namespace ODiff.Tests
                 var b = new Person();
                 b.NameProperty = "Gøran";
 
-                DiffResult result = Diff.Object(a, b);
+                DiffResult result = Diff.ObjectValues(a, b);
                 
                 Assert.AreEqual(false, result.DiffFound);
             }

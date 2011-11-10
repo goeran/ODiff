@@ -7,7 +7,7 @@ namespace ODiff
     {
         private static readonly DiffResult NoDiffFound = new DiffResult(diffFound: false);
 
-        public static DiffResult Object(object left, object right)
+        public static DiffResult ObjectValues(object left, object right)
         {
             var result = CheckPublicFields(left, right);
             result.Merge(CheckGetterProperties(left, right));
@@ -25,7 +25,7 @@ namespace ODiff
                 var rightValue = rightFields[i].GetValue(right);
 
                 if (leftValue != null && rightValue != null &&
-                    AreEqual(leftValue, rightValue))
+                    !AreEqual(leftValue, rightValue))
                     return new DiffResult(diffFound: true);
             }
 
@@ -39,12 +39,13 @@ namespace ODiff
             {
                 var leftAsInt = (int) leftValue;
                 var rightAsInt = (int) rightValue;
-                return leftAsInt != rightAsInt;
+                return leftAsInt == rightAsInt;
             }
             if (leftValue.GetType().IsPrimitive)
-                return !leftValue.Equals(rightValue);
-            
-            return false; //object ref to an another object
+                return leftValue.Equals(rightValue);
+            if (leftValue.GetType() == rightValue.GetType())
+                return true;
+            return false; 
         }
 
         private static FieldInfo[] PublicFields(object left)
@@ -63,7 +64,7 @@ namespace ODiff
                 var rightValue = rightGetterProps[i].GetValue(right, new object[] {});
 
                 if (leftValue != null && rightValue != null &&
-                    AreEqual(leftValue, rightValue))
+                    !AreEqual(leftValue, rightValue))
                     return new DiffResult(diffFound: true);
             }
 
