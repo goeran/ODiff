@@ -49,6 +49,7 @@ namespace ODiff
 
         private static DiffReport CheckPublicFields(object left, object right)
         {
+            var diffReport = new DiffReport();
             var leftFields = left.PublicFields();
             var rightFields = right.PublicFields();
 
@@ -57,12 +58,14 @@ namespace ODiff
                 var leftValue = leftFields[i].GetValue(left);
                 var rightValue = rightFields[i].GetValue(right);
 
-                if (leftValue != null && rightValue != null &&
-                    !AreEqual(leftValue, rightValue))
-                    return new DiffReport(diffFound: true);
+                if (!AreEqual(leftValue, rightValue))
+                {
+                    var fieldReport = new DiffReport(diffFound: true);
+                    fieldReport.ReportDiff("obj." + leftFields[i].Name, leftValue, rightValue);
+                    diffReport.Merge(fieldReport);
+                }
             }
-
-            return NoDiffFound();
+            return diffReport;
         }
 
         private static bool AreEqual(object leftValue, object rightValue)
@@ -91,6 +94,7 @@ namespace ODiff
 
         private static DiffReport CheckGetterProperties(object left, object right)
         {
+            var diffReport = new DiffReport();
             var leftGetterProps = left.PublicGetterProperties();
             var rightGetterProps = right.PublicGetterProperties();
 
@@ -107,14 +111,13 @@ namespace ODiff
 
                     if (!AreEqual(leftValue, rightValue))
                     {
-                        var report = new DiffReport(diffFound: true);
-                        report.ReportDiff("obj." + leftGetterProps[i].Name, leftValue, rightValue);
-                        return report;
+                        var propertyReport = new DiffReport(diffFound: true);
+                        propertyReport.ReportDiff("obj." + leftGetterProps[i].Name, leftValue, rightValue);
+                        diffReport.Merge(propertyReport);
                     }
                 }
             }
-
-            return NoDiffFound();
+            return diffReport;
         }
     }
 }

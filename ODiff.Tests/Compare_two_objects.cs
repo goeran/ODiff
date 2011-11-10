@@ -53,8 +53,8 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_public_String_fields()
             {
-                var a = new Person {NameAsField = "Steve"};
-                var b = new Person {NameAsField = "Bill"};
+                var a = new Person {NameField = "Steve"};
+                var b = new Person {NameField = "Bill"};
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
@@ -62,8 +62,8 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_public_int_properties()
             {
-                var a = new Person {AgeAsProperty = 20};
-                var b = new Person {AgeAsProperty = 29};
+                var a = new Person {AgeProperty = 20};
+                var b = new Person {AgeProperty = 29};
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
@@ -71,8 +71,8 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_public_int_fields()
             {
-                var a = new Person { AgeAsField = 20 };
-                var b = new Person { AgeAsField = 29 };
+                var a = new Person { AgeField = 20 };
+                var b = new Person { AgeField = 29 };
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
@@ -103,6 +103,30 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
+
+            [Test]
+            public void It_will_report_multiple_diffs()
+            {
+                var left = new Person
+                {
+                    NameProperty = "Gøran", AgeProperty = 29,
+                    NameField = "Hansen", AgeField = 31
+                };
+                var right = new Person
+                {
+                    NameProperty = "Gøran Hansen", AgeProperty = 30,
+                    NameField = "Mr Hansen", AgeField = 32
+                };
+
+                var report = Diff.ObjectValues(left, right);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(4, report.Table.Rows.Count());
+                Assert.AreEqual("obj.NameField", report.Table[0].Member);
+                Assert.AreEqual("obj.AgeField", report.Table[1].Member);
+                Assert.AreEqual("obj.NameProperty", report.Table[2].Member);
+                Assert.AreEqual("obj.AgeProperty", report.Table[3].Member);
+            }
         }
 
         [TestFixture]
@@ -118,7 +142,7 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Count", report.Table[0].Property);
+                Assert.AreEqual("obj.Count", report.Table[0].Member);
                 Assert.AreEqual(1, report.Table[0].LeftValue);
                 Assert.AreEqual(2, report.Table[0].RightValue);
             }
@@ -133,7 +157,7 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj[1]", report.Table[0].Property);
+                Assert.AreEqual("obj[1]", report.Table[0].Member);
             }
         }
 
@@ -157,11 +181,11 @@ namespace ODiff.Tests
         private class Person
         {
             public string NameProperty { get; set; }
-            public int AgeAsProperty { get; set; }
+            public int AgeProperty { get; set; }
             public List<object> Assets { get; set; }
 
-            public string NameAsField;
-            public int AgeAsField;
+            public string NameField;
+            public int AgeField;
         }
     }
 }

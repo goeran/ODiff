@@ -20,7 +20,7 @@ namespace ODiff
         {
             rows.Add(new DiffReportTableRow
             {
-                Property = property,
+                Member = property,
                 LeftValue = leftValue,
                 RightValue = rightValue
             });
