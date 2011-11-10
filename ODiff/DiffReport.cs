@@ -1,28 +1,26 @@
-﻿using System;
-
-namespace ODiff
+﻿namespace ODiff
 {
-    public class DiffResult
+    public class DiffReport
     {
-        private readonly DiffResultTable table = new DiffResultTable();
+        private readonly ReportTable table = new ReportTable();
 
-        public DiffResult()
+        public DiffReport()
         {
         }
 
-        public DiffResult(bool diffFound)
+        public DiffReport(bool diffFound)
         {
             DiffFound = diffFound;
         }
 
         public bool DiffFound { get; private set; }
 
-        public DiffResultTable Table
+        public ReportTable Table
         {
             get { return table; }
         }
 
-        public void Merge(DiffResult anotherResult)
+        public void Merge(DiffReport anotherResult)
         {
             if (!DiffFound)
             {
@@ -31,7 +29,7 @@ namespace ODiff
             table.AddRows(anotherResult.Table);
         }
 
-        public void Report(string property, object leftValue, object rightValue)
+        public void ReportDiff(string property, object leftValue, object rightValue)
         {
             table.AddRow(property, leftValue, rightValue);
         }

@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ODiff
 {
-    public class DiffResultTable  
+    public class ReportTable  
     {
-        private readonly List<DiffResultTableRow> rows = new List<DiffResultTableRow>();
+        private readonly List<DiffReportTableRow> rows = new List<DiffReportTableRow>();
 
-        public DiffResultTableRow this[int index]
+        public DiffReportTableRow this[int index]
         {
             get { return rows[index]; }
         }
 
-        public IEnumerable<DiffResultTableRow> Rows
+        public IEnumerable<DiffReportTableRow> Rows
         {
             get { return rows; }
         }
 
         public void AddRow(string property, object leftValue, object rightValue)
         {
-            rows.Add(new DiffResultTableRow
+            rows.Add(new DiffReportTableRow
             {
                 Property = property,
                 LeftValue = leftValue,
@@ -28,7 +26,7 @@ namespace ODiff
             });
         }
 
-        public void AddRows(DiffResultTable table)
+        public void AddRows(ReportTable table)
         {
             foreach (var row in table.rows)
             {

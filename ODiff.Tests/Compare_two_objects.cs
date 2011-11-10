@@ -148,7 +148,7 @@ namespace ODiff.Tests
                 var b = new Person();
                 b.NameProperty = "Gøran";
 
-                DiffResult result = Diff.ObjectValues(a, b);
+                DiffReport result = Diff.ObjectValues(a, b);
                 
                 Assert.AreEqual(false, result.DiffFound);
             }

@@ -41,9 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diff.cs" />
-    <Compile Include="DiffResult.cs" />
-    <Compile Include="DiffResultTable.cs" />
-    <Compile Include="DiffResultTableRow.cs" />
+    <Compile Include="DiffReport.cs" />
+    <Compile Include="ReportTable.cs" />
+    <Compile Include="DiffReportTableRow.cs" />
     <Compile Include="Extensions\PropertyInfoExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -7,14 +7,14 @@ namespace ODiff
 {
     public class Diff
     {
-        public static DiffResult ObjectValues(object left, object right)
+        public static DiffReport ObjectValues(object left, object right)
         {
             if (left == null && right == null) return NoDiffFound();
             if ((left == null && right != null) ||
                 (left != null && right == null)) 
-                return new DiffResult(diffFound: true);
+                return new DiffReport(diffFound: true);
 
-            var report = new DiffResult();
+            var report = new DiffReport();
 
             if (left.IsList() &&
                 right.IsList())
@@ -27,27 +27,27 @@ namespace ODiff
             return report;
         }
 
-        private static DiffResult CompareLists(IList left, IList right)
+        private static DiffReport CompareLists(IList left, IList right)
         {
-            var report = new DiffResult();
+            var report = new DiffReport();
             for (int i = 0; i < left.Count; i++)
             {
                 if (!AreEqual(left[i], right[i]))
                 {
-                    var listItemReport = new DiffResult(diffFound: true);
-                    listItemReport.Report("obj[" + i + "]", left[i], left[i]);
+                    var listItemReport = new DiffReport(diffFound: true);
+                    listItemReport.ReportDiff("obj[" + i + "]", left[i], left[i]);
                     report.Merge(listItemReport);
                 }
             }
             return report;
         }
 
-        private static DiffResult NoDiffFound()
+        private static DiffReport NoDiffFound()
         {
-            return new DiffResult(diffFound: false);
+            return new DiffReport(diffFound: false);
         }
 
-        private static DiffResult CheckPublicFields(object left, object right)
+        private static DiffReport CheckPublicFields(object left, object right)
         {
             var leftFields = left.PublicFields();
             var rightFields = right.PublicFields();
@@ -59,7 +59,7 @@ namespace ODiff
 
                 if (leftValue != null && rightValue != null &&
                     !AreEqual(leftValue, rightValue))
-                    return new DiffResult(diffFound: true);
+                    return new DiffReport(diffFound: true);
             }
 
             return NoDiffFound();
@@ -89,7 +89,7 @@ namespace ODiff
             return true; 
         }
 
-        private static DiffResult CheckGetterProperties(object left, object right)
+        private static DiffReport CheckGetterProperties(object left, object right)
         {
             var leftGetterProps = left.PublicGetterProperties();
             var rightGetterProps = right.PublicGetterProperties();
@@ -107,8 +107,8 @@ namespace ODiff
 
                     if (!AreEqual(leftValue, rightValue))
                     {
-                        var report = new DiffResult(diffFound: true);
-                        report.Report("obj." + leftGetterProps[i].Name, leftValue, rightValue);
+                        var report = new DiffReport(diffFound: true);
+                        report.ReportDiff("obj." + leftGetterProps[i].Name, leftValue, rightValue);
                         return report;
                     }
                 }
