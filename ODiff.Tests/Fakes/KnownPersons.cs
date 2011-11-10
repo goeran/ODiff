@@ -40,6 +40,12 @@ namespace ODiff.Tests.Fakes
                             NameField = "LarryEllison",
                             AgeField = 32
                         }
+                    },
+                    Tags = new List<string>
+                    {
+                        "genious", 
+                        "mad",
+                        "hardware"
                     }
                 };
             }

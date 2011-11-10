@@ -12,6 +12,7 @@ namespace ODiff.Tests.Fakes
 
         public string NameField;
         public int AgeField;
+        public List<string> Tags;
 
     }
 }

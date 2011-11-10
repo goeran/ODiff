@@ -24,12 +24,10 @@ namespace ODiff
             {
                 report.Merge(CompareLists(member, left as IList, right as IList));
             }
-
             report.Merge(CheckPublicFields(member, left, right));
             report.Merge(CheckGetterProperties(member, left, right));
             return report;
         }
-
 
         private static DiffReport CompareLists(string member, IList left, IList right)
         {
@@ -78,11 +76,17 @@ namespace ODiff
                 var leftValue = leftFields[i].GetValue(left);
                 var rightValue = rightFields[i].GetValue(right);
 
-                if (!AreEqual(leftValue, rightValue))
+                if (leftValue.IsPrimitiveValueOrString() &&
+                    rightValue.IsPrimitiveValueOrString() &&
+                    !AreEqual(leftValue, rightValue))
                 {
                     var fieldReport = new DiffReport(diffFound: true);
                     fieldReport.ReportDiff(member + "." + leftFields[i].Name, leftValue, rightValue);
                     diffReport.Merge(fieldReport);
+                }
+                else
+                {
+                    diffReport.Merge(CompareObjectValues(member + "." + leftFields[i].Name, leftValue, rightValue));
                 }
             }
             return diffReport;

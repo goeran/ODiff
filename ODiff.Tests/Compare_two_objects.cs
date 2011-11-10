@@ -224,5 +224,24 @@ namespace ODiff.Tests
                 Assert.AreEqual("obj.Children.Count", report.Table[5].Member);
             }            
         }
+
+        [TestFixture]
+        public class When_object_fields_contains_lists
+        {
+            [Test]
+            public void It_will_compare_all_members_in_list()
+            {
+                var steve = FakeData.KnownPersons.SteveJobs;
+                var steveCopy = ObjectCloner.Clone(steve) as Person;
+                steveCopy.Tags.Add("phones");
+
+                var report = Diff.ObjectValues(steve, steveCopy);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(2, report.Table.Rows.Count());
+                Assert.AreEqual("obj.Tags[3]", report.Table[0].Member);
+                Assert.AreEqual("obj.Tags.Count", report.Table[1].Member);
+            }
+        }
     }
 }
