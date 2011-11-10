@@ -190,19 +190,15 @@ namespace ODiff.Tests
         }
 
         [TestFixture]
-        public class When_diff_object_properties_with_primitive_values
+        public class When_diff_equal_objects
         {
             [Test]
-            public void It_will_not_report_diff_if_values_are_equal()
+            public void It_will_not_report_diff()
             {
-                var a = new Person();
-                a.NameProperty = "Gøran";
-                var b = new Person();
-                b.NameProperty = "Gøran";
+                var steve = FakeData.KnownPersons.SteveJobs;
+                var steveExactCopy = ObjectCloner.Clone(steve);
 
-                DiffReport result = Diff.ObjectValues(a, b);
-                
-                Assert.AreEqual(false, result.DiffFound);
+                Assert.IsFalse(Diff.ObjectValues(steve, steveExactCopy).DiffFound);
             }
         }
 
@@ -212,18 +208,20 @@ namespace ODiff.Tests
             [Test]
             public void It_will_recursively_compare_all_members_of_list()
             {
-                var steve = FakeData.Persons.Single(p => p.NameProperty == "Steve Jobs");
+                var steve = FakeData.KnownPersons.SteveJobs;
                 var steveCopy = ObjectCloner.Clone(steve) as Person;
-                steveCopy.Children.Clear();
+                steveCopy.Children.RemoveAt(0);
 
                 var report = Diff.ObjectValues(steve, steveCopy);
 
                 Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(2, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Children[0]", report.Table[0].Member);
-                Assert.AreEqual(steve.Children[0], report.Table[0].LeftValue);
-                Assert.AreEqual(null, report.Table[0].RightValue);
-                Assert.AreEqual("obj.Children.Count", report.Table[1].Member);
+                Assert.AreEqual(6, report.Table.Rows.Count());
+                Assert.AreEqual("obj.Children[0].NameField", report.Table[0].Member);
+                Assert.AreEqual("obj.Children[0].AgeField", report.Table[1].Member);
+                Assert.AreEqual("obj.Children[0].NameProperty", report.Table[2].Member);
+                Assert.AreEqual("obj.Children[0].AgeProperty", report.Table[3].Member);
+                Assert.AreEqual("obj.Children[1]", report.Table[4].Member);
+                Assert.AreEqual("obj.Children.Count", report.Table[5].Member);
             }            
         }
     }

@@ -1,19 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ODiff.Tests.Fakes;
+﻿using System.Collections.Generic;
 
-namespace ODiff.Tests
+namespace ODiff.Tests.Fakes
 {
-    public class FakeData
+    public class KnownPersons
     {
-        public static IEnumerable<Person> Persons
+        public IEnumerable<Person> All
         {
             get
             {
                 var persons = new List<Person>();
-                var steve = new Person
+                persons.Add(SteveJobs);
+                return persons;
+            }
+        }
+
+        public Person SteveJobs
+        {
+            get
+            {
+                return new Person
                 {
                     NameProperty = "Steve Jobs",
                     AgeProperty = 55,
@@ -27,11 +32,16 @@ namespace ODiff.Tests
                             AgeProperty = 30,
                             NameField = "Unclebob Martin",
                             AgeField = 30
+                        },
+                        new Person
+                        {
+                            NameProperty = "Larry Ellison",
+                            AgeProperty = 32,
+                            NameField = "LarryEllison",
+                            AgeField = 32
                         }
                     }
                 };
-                persons.Add(steve);
-                return persons;
             }
         }
     }
