@@ -1,25 +1,39 @@
-﻿namespace ODiff
+﻿using System;
+
+namespace ODiff
 {
     public class DiffResult
     {
-        private bool diffFound;
+        private readonly DiffResultTable table = new DiffResultTable();
+
+        public DiffResult()
+        {
+        }
 
         public DiffResult(bool diffFound)
         {
-            this.diffFound = diffFound;
+            DiffFound = diffFound;
         }
 
-        public bool DiffFound
+        public bool DiffFound { get; private set; }
+
+        public DiffResultTable Table
         {
-            get { return diffFound; }
+            get { return table; }
         }
 
         public void Merge(DiffResult anotherResult)
         {
-            if (!diffFound)
+            if (!DiffFound)
             {
-                diffFound = anotherResult.diffFound;
+                DiffFound = anotherResult.DiffFound;
             }
+            table.AddRows(anotherResult.Table);
+        }
+
+        public void Report(string property, object leftValue, object rightValue)
+        {
+            table.AddRow(property, leftValue, rightValue);
         }
     }
 }

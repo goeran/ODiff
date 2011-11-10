@@ -1,10 +1,43 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace ODiff.Tests
 {
     public class Compare_two_objects
     {
+        [TestFixture]
+        public class When_diff_objects_and_null
+        {
+            [Test]
+            public void It_will_report_diff_when_left_is_null()
+            {
+                Object a = null;
+                var b = new Person();
+
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+            }
+
+            [Test]
+            public void It_will_report_diff_when_right_is_null()
+            {
+                var a = new Person();
+                Object b = null;
+
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+            }
+
+            [Test]
+            public void It_will_not_report_diff_when_both_null()
+            {
+                Object a = null;
+                Object b = null;
+
+                Assert.IsFalse(Diff.ObjectValues(a, b).DiffFound);
+            }
+        }
+
         [TestFixture]
         public class When_diff_uneqal_objects
         {
@@ -54,11 +87,53 @@ namespace ODiff.Tests
             }
 
             [Test]
-            public void It_will_report_diff_on_object_references_when_null()
+            public void It_will_report_diff_on_object_references_when_left_is_null()
             {
                 var a = new Person {};
                 var b = new Person {Assets = new List<object>()};
 
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_object_references_when_right_is_null()
+            {
+                var a = new Person {Assets = new List<object>()};
+                var b = new Person();
+
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+            }
+        }
+
+        [TestFixture]
+        public class When_diff_lists
+        {
+            [Test]
+            public void It_will_report_diff_on_length()
+            {
+                var left = new List<string> {"a"};
+                var right = new List<string> {"a", "b"};
+
+                var report = Diff.ObjectValues(left, right);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("obj.Count", report.Table[0].Property);
+                Assert.AreEqual(1, report.Table[0].LeftValue);
+                Assert.AreEqual(2, report.Table[0].RightValue);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_content_in_lists()
+            {
+                var left = new List<string> { "a", "a" };
+                var right = new List<string> { "a", "b" };
+
+                var report = Diff.ObjectValues(left, right);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("obj[1]", report.Table[0].Property);
             }
         }
 
