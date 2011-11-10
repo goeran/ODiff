@@ -129,11 +129,17 @@ namespace ODiff
                     var leftValue = leftProperty.GetValue(left);
                     var rightValue = rightProperty.GetValue(right);
 
-                    if (!AreEqual(leftValue, rightValue))
+                    if (leftValue.IsPrimitiveValueOrString() &&
+                        rightValue.IsPrimitiveValueOrString() &&
+                        !AreEqual(leftValue, rightValue))
                     {
                         var propertyReport = new DiffReport(diffFound: true);
                         propertyReport.ReportDiff(member + "." + leftGetterProps[i].Name, leftValue, rightValue);
                         diffReport.Merge(propertyReport);
+                    }
+                    else
+                    {
+                        diffReport.Merge(CompareObjectValues(member + "." + leftProperty.Name, leftValue, rightValue));
                     }
                 }
             }

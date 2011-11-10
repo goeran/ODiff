@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using ODiff.Tests.Fakes;
+using ODiff.Tests.Utils;
 
 namespace ODiff.Tests
 {
@@ -80,8 +82,8 @@ namespace ODiff.Tests
             [Test]
             public void It_will_not_report_diff_on_object_references()
             {
-                var a = new Person {Assets = new List<object>()};
-                var b = new Person {Assets = new List<object>()};
+                var a = new Person { Children = new List<Person>() };
+                var b = new Person {Children = new List<Person>()};
 
                 Assert.IsFalse(Diff.ObjectValues(a, b).DiffFound);
             }
@@ -90,7 +92,7 @@ namespace ODiff.Tests
             public void It_will_report_diff_on_object_references_when_left_is_null()
             {
                 var a = new Person {};
-                var b = new Person {Assets = new List<object>()};
+                var b = new Person {Children = new List<Person>()};
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
             }
@@ -98,7 +100,7 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_object_references_when_right_is_null()
             {
-                var a = new Person {Assets = new List<object>()};
+                var a = new Person { Children = new List<Person>() };
                 var b = new Person();
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
@@ -202,16 +204,27 @@ namespace ODiff.Tests
                 
                 Assert.AreEqual(false, result.DiffFound);
             }
-        }  
-      
-        private class Person
-        {
-            public string NameProperty { get; set; }
-            public int AgeProperty { get; set; }
-            public List<object> Assets { get; set; }
+        }
 
-            public string NameField;
-            public int AgeField;
+        [TestFixture]
+        public class When_object_properties_contains_lists
+        {
+            [Test]
+            public void It_will_recursively_compare_all_members_of_list()
+            {
+                var steve = FakeData.Persons.Single(p => p.NameProperty == "Steve Jobs");
+                var steveCopy = ObjectCloner.Clone(steve) as Person;
+                steveCopy.Children.Clear();
+
+                var report = Diff.ObjectValues(steve, steveCopy);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(2, report.Table.Rows.Count());
+                Assert.AreEqual("obj.Children[0]", report.Table[0].Member);
+                Assert.AreEqual(steve.Children[0], report.Table[0].LeftValue);
+                Assert.AreEqual(null, report.Table[0].RightValue);
+                Assert.AreEqual("obj.Children.Count", report.Table[1].Member);
+            }            
         }
     }
 }
