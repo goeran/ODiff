@@ -46,14 +46,12 @@ namespace ODiff
             {
                 var leftValue = i >= leftList.Count ? null : leftList[i];
                 var rightValue = i >= rightList.Count ? null : rightList[i];
-                if (leftValue.IsPrimitiveValueOrString())
+                if (leftValue.IsPrimitiveValueOrString() &&
+                    !AreEqual(leftValue, rightValue))
                 {
-                    if (!AreEqual(leftValue, rightValue))
-                    {
                         var listItemReport = new DiffReport(diffFound: true);
                         listItemReport.ReportDiff(currentMemberName + "[" + i + "]", leftList[i], leftList[i]);
                         report.Merge(listItemReport);
-                    }
                 }
                 else if (leftValue == null || rightValue == null)
                 {
@@ -141,11 +139,11 @@ namespace ODiff
             return true;
         }
 
-        private DiffReport CompareGetterProperties(object left, object right)
+        private DiffReport CompareGetterProperties(object leftObject, object rightObject)
         {
             var diffReport = new DiffReport();
-            var leftGetterProps = left.PublicGetterProperties();
-            var rightGetterProps = right.PublicGetterProperties();
+            var leftGetterProps = leftObject.PublicGetterProperties();
+            var rightGetterProps = rightObject.PublicGetterProperties();
 
             for (int i = 0; i < leftGetterProps.Length; i++)
             {
@@ -155,8 +153,8 @@ namespace ODiff
                 if (!leftProperty.IsIndexerProperty() &&
                     !rightProperty.IsIndexerProperty())
                 {
-                    var leftValue = leftProperty.GetValue(left);
-                    var rightValue = rightProperty.GetValue(right);
+                    var leftValue = leftProperty.GetValue(leftObject);
+                    var rightValue = rightProperty.GetValue(rightObject);
 
                     diffReport.Merge(CompareValue(leftValue, rightValue, leftProperty.Name));
                 }
