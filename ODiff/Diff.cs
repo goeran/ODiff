@@ -34,12 +34,12 @@ namespace ODiff
         private static DiffReport CompareLists(string member, IList left, IList right)
         {
             var report = new DiffReport();
-            for (int i = 0; i < left.Count; i++)
+            var largestList = left.Count >= right.Count ? left : right;
+            for (int i = 0; i < largestList.Count; i++)
             {
-                var leftValue = left[i];
-                var rightValue = right[i];
-                if (leftValue != null &&
-                    leftValue.IsPrimitiveValueOrString())
+                var leftValue = i >= left.Count ? null : left[i];
+                var rightValue = i >= right.Count ? null : right[i];
+                if (leftValue.IsPrimitiveValueOrString())
                 {
                     if (!AreEqual(leftValue, rightValue))
                     {
@@ -47,6 +47,12 @@ namespace ODiff
                         listItemReport.ReportDiff(member + "[" + i + "]", left[i], left[i]);
                         report.Merge(listItemReport);
                     }
+                }
+                else if (leftValue == null || rightValue == null)
+                {
+                    var missingItemReport = new DiffReport(diffFound: true);
+                    missingItemReport.ReportDiff(member + "[" + i + "]", leftValue, rightValue);
+                    report.Merge(missingItemReport);
                 }
                 else
                 {

@@ -141,10 +141,10 @@ namespace ODiff.Tests
                 var report = Diff.ObjectValues(left, right);
 
                 Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Count", report.Table[0].Member);
-                Assert.AreEqual(1, report.Table[0].LeftValue);
-                Assert.AreEqual(2, report.Table[0].RightValue);
+                Assert.AreEqual(2, report.Table.Rows.Count());
+                Assert.AreEqual("obj.Count", report.Table[1].Member);
+                Assert.AreEqual(1, report.Table[1].LeftValue);
+                Assert.AreEqual(2, report.Table[1].RightValue);
             }
 
             [Test]
@@ -171,6 +171,19 @@ namespace ODiff.Tests
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
                 Assert.AreEqual("obj[0].NameProperty", report.Table[0].Member);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_lists_in_lists()
+            {
+                var left = new List<List<string>> {new List<string>{ "a"}};
+                var right = new List<List<string>> {new List<string>{ "a", "b"}};
+
+                var report = Diff.ObjectValues(left, right);
+
+                Assert.AreEqual(2, report.Table.Rows.Count());
+                Assert.AreEqual("obj[0][1]", report.Table[0].Member);
+                Assert.AreEqual("obj[0].Count", report.Table[1].Member);
             }
         }
 
