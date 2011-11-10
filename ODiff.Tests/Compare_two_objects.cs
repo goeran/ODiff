@@ -159,6 +159,19 @@ namespace ODiff.Tests
                 Assert.AreEqual(1, report.Table.Rows.Count());
                 Assert.AreEqual("obj[1]", report.Table[0].Member);
             }
+
+            [Test]
+            public void It_will_report_diff_on_objects_in_lists()
+            {
+                var left = new List<Person> {new Person {NameProperty = "Gøran"}};
+                var right = new List<Person> {new Person {NameProperty = "Gøran Hansen"}};
+
+                var report = Diff.ObjectValues(left, right);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("obj[0].NameProperty", report.Table[0].Member);
+            }
         }
 
         [TestFixture]

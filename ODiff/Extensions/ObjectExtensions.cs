@@ -19,5 +19,10 @@ namespace ODiff.Extensions
         {
             return obj is IList;
         }
+
+        public static bool IsPrimitiveValueOrString(this object obj)
+        {
+            return obj.GetType().IsPrimitive || obj is string;
+        }
     }
 }

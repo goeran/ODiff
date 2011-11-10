@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
+﻿using System.Collections;
 using ODiff.Extensions;
 
 namespace ODiff
@@ -8,6 +6,11 @@ namespace ODiff
     public class Diff
     {
         public static DiffReport ObjectValues(object left, object right)
+        {
+            return CompareObjectValues("obj", left, right);
+        }
+
+        private static DiffReport CompareObjectValues(string member, object left, object right)
         {
             if (left == null && right == null) return NoDiffFound();
             if ((left == null && right != null) ||
@@ -19,24 +22,35 @@ namespace ODiff
             if (left.IsList() &&
                 right.IsList())
             {
-                report.Merge(CompareLists(left as IList, right as IList));
+                report.Merge(CompareLists(member, left as IList, right as IList));
             }
 
-            report.Merge(CheckPublicFields(left, right));
-            report.Merge(CheckGetterProperties(left, right));
+            report.Merge(CheckPublicFields(member, left, right));
+            report.Merge(CheckGetterProperties(member, left, right));
             return report;
         }
 
-        private static DiffReport CompareLists(IList left, IList right)
+
+        private static DiffReport CompareLists(string member, IList left, IList right)
         {
             var report = new DiffReport();
             for (int i = 0; i < left.Count; i++)
             {
-                if (!AreEqual(left[i], right[i]))
+                var leftValue = left[i];
+                var rightValue = right[i];
+                if (leftValue != null &&
+                    leftValue.IsPrimitiveValueOrString())
                 {
-                    var listItemReport = new DiffReport(diffFound: true);
-                    listItemReport.ReportDiff("obj[" + i + "]", left[i], left[i]);
-                    report.Merge(listItemReport);
+                    if (!AreEqual(leftValue, rightValue))
+                    {
+                        var listItemReport = new DiffReport(diffFound: true);
+                        listItemReport.ReportDiff(member + "[" + i + "]", left[i], left[i]);
+                        report.Merge(listItemReport);
+                    }
+                }
+                else
+                {
+                    report.Merge(CompareObjectValues(member + "[" + i + "]", leftValue, rightValue));
                 }
             }
             return report;
@@ -47,7 +61,7 @@ namespace ODiff
             return new DiffReport(diffFound: false);
         }
 
-        private static DiffReport CheckPublicFields(object left, object right)
+        private static DiffReport CheckPublicFields(string member, object left, object right)
         {
             var diffReport = new DiffReport();
             var leftFields = left.PublicFields();
@@ -61,7 +75,7 @@ namespace ODiff
                 if (!AreEqual(leftValue, rightValue))
                 {
                     var fieldReport = new DiffReport(diffFound: true);
-                    fieldReport.ReportDiff("obj." + leftFields[i].Name, leftValue, rightValue);
+                    fieldReport.ReportDiff(member + "." + leftFields[i].Name, leftValue, rightValue);
                     diffReport.Merge(fieldReport);
                 }
             }
@@ -92,7 +106,7 @@ namespace ODiff
             return true; 
         }
 
-        private static DiffReport CheckGetterProperties(object left, object right)
+        private static DiffReport CheckGetterProperties(string member, object left, object right)
         {
             var diffReport = new DiffReport();
             var leftGetterProps = left.PublicGetterProperties();
@@ -112,7 +126,7 @@ namespace ODiff
                     if (!AreEqual(leftValue, rightValue))
                     {
                         var propertyReport = new DiffReport(diffFound: true);
-                        propertyReport.ReportDiff("obj." + leftGetterProps[i].Name, leftValue, rightValue);
+                        propertyReport.ReportDiff(member + "." + leftGetterProps[i].Name, leftValue, rightValue);
                         diffReport.Merge(propertyReport);
                     }
                 }
