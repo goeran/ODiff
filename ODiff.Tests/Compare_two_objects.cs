@@ -93,9 +93,30 @@ namespace ODiff.Tests
             }
 
             [Test]
+            public void It_will_report_diff_on_public_int_properties()
+            {
+                var left = new Person {AgeProperty = 20};
+                var right = new Person {AgeProperty = 29};
+                
+                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
+            }
+
+            [Test]
             public void It_will_report_diff_on_public_float_properties()
             {
-                
+                var left = new Person {WeightProperty = 80};
+                var right = new Person {WeightProperty = 81};
+
+                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_public_float_field()
+            {
+                var left = new Person { WeightField = 70 };
+                var right = new Person { WeightField = 81 };
+
+                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
             }
 
             [Test]
