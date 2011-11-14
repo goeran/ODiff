@@ -6,19 +6,20 @@ namespace ODiff
 {
     internal class ObjectGraphDiff
     {
-        private readonly object left;
-        private readonly object right;
-        private string currentMemberName = "obj";
+        private readonly object leftRoot;
+        private readonly object rightRoot;
+        private string currentMemberPath = "obj";
+        private string previousMemberName;
 
-        public ObjectGraphDiff(Object left, Object right)
+        public ObjectGraphDiff(Object leftRoot, Object rightRoot)
         {
-            this.right = right;
-            this.left = left;
+            this.rightRoot = rightRoot;
+            this.leftRoot = leftRoot;
         }
 
         public DiffReport Diff()
         {
-            return CompareObject(left, right);
+            return CompareObject(leftRoot, rightRoot);
         }
 
         private DiffReport CompareObject(object leftObject, object rightObject)
@@ -30,9 +31,8 @@ namespace ODiff
 
             if (leftObject.IsList() &&
                 rightObject.IsList())
-            {
                 report.Merge(CompareList(leftObject as IList, rightObject as IList));
-            }
+
             report.Merge(ComparePublicFields(leftObject, rightObject));
             report.Merge(CompareGetterProperties(leftObject, rightObject));
             return report;
@@ -42,32 +42,43 @@ namespace ODiff
         {
             var report = new DiffReport();
             var largestList = leftList.Count >= rightList.Count ? leftList : rightList;
-            for (int i = 0; i < largestList.Count; i++)
+            for (var i = 0; i < largestList.Count; i++)
             {
                 var leftValue = i >= leftList.Count ? null : leftList[i];
                 var rightValue = i >= rightList.Count ? null : rightList[i];
+                ObjectGraphPath(currentMemberPath + "[" + i + "]");
+
                 if (leftValue.IsValueType() &&
                     !AreEqual(leftValue, rightValue))
                 {
-                        var listItemReport = new DiffReport(diffFound: true);
-                        listItemReport.ReportDiff(currentMemberName + "[" + i + "]", leftList[i], leftList[i]);
-                        report.Merge(listItemReport);
+                    var listItemReport = new DiffReport(diffFound: true);
+                    listItemReport.ReportDiff(currentMemberPath, leftValue, rightValue);
+                    report.Merge(listItemReport);
                 }
                 else if (leftValue == null || rightValue == null)
                 {
                     var missingItemReport = new DiffReport(diffFound: true);
-                    missingItemReport.ReportDiff(currentMemberName + "[" + i + "]", leftValue, rightValue);
+                    missingItemReport.ReportDiff(currentMemberPath, leftValue, rightValue);
                     report.Merge(missingItemReport);
                 }
                 else
                 {
-                    var previousMemberName = currentMemberName;
-                    currentMemberName = currentMemberName + "[" + i + "]";
                     report.Merge(CompareObject(leftValue, rightValue));
-                    currentMemberName = previousMemberName;
                 }
+                PreviousGraphPath();
             }
             return report;
+        }
+
+        private void ObjectGraphPath(string path)
+        {
+            previousMemberName = currentMemberPath;
+            currentMemberPath = path;
+        }
+
+        private void PreviousGraphPath()
+        {
+            currentMemberPath = previousMemberName;
         }
 
         private static DiffReport NoDiffFound()
@@ -97,19 +108,20 @@ namespace ODiff
             var report = new DiffReport();
             if ((leftValue.IsValueType() &&
                 rightValue.IsValueType() ||
-                leftValue.IsEnum() && rightValue.IsEnum()) &&
+                leftValue.IsEnum() && 
+                rightValue.IsEnum()) &&
                 !AreEqual(leftValue, rightValue))
             {
                 var fieldReport = new DiffReport(diffFound: true);
-                fieldReport.ReportDiff(currentMemberName + "." + fieldName, leftValue, rightValue);
+                fieldReport.ReportDiff(currentMemberPath + "." + fieldName, leftValue, rightValue);
                 report.Merge(fieldReport);
             }
             else
             {
-                var previousMemberName = currentMemberName;
-                currentMemberName += "." + fieldName;
+                var previousMemberName = currentMemberPath;
+                currentMemberPath += "." + fieldName;
                 report.Merge(CompareObject(leftValue, rightValue));
-                currentMemberName = previousMemberName;
+                currentMemberPath = previousMemberName;
             }
             return report;
         }
@@ -122,9 +134,6 @@ namespace ODiff
             if (leftValue.IsValueType() ||
                 leftValue.IsEnum())
                 return leftValue.Equals(rightValue);
-
-            if (leftValue.GetType() == rightValue.GetType())
-                return true;
 
             return true;
         }
