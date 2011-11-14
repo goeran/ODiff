@@ -73,6 +73,17 @@ namespace ODiff.Tests
             }
 
             [Test]
+            public void It_will_report_diff_on_public_decimal_fields()
+            {
+                var a = new Person { HeightField = 1.8m };
+                var b = new Person { HeightField = 2.10m };
+
+                var diff = Diff.ObjectValues(a, b);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+                Assert.AreEqual("obj.HeightField", diff.Table[0].Member);
+            }
+
+            [Test]
             public void It_will_report_diff_on_public_int_fields()
             {
                 var a = new Person { AgeField = 20 };
