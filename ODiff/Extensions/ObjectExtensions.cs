@@ -24,5 +24,10 @@ namespace ODiff.Extensions
         {
             return obj != null && (obj.GetType().IsPrimitive || obj is string);
         }
+
+        public static bool IsEnum(this object obj)
+        {
+            return obj != null && obj.GetType().IsEnum;
+        }
     }
 }

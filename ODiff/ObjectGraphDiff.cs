@@ -95,8 +95,9 @@ namespace ODiff
         private DiffReport CompareValue(object leftValue, object rightValue, string fieldName)
         {
             var report = new DiffReport();
-            if (leftValue.IsPrimitiveValueOrString() &&
-                rightValue.IsPrimitiveValueOrString() &&
+            if ((leftValue.IsPrimitiveValueOrString() &&
+                rightValue.IsPrimitiveValueOrString() ||
+                leftValue.IsEnum() && rightValue.IsEnum()) &&
                 !AreEqual(leftValue, rightValue))
             {
                 var fieldReport = new DiffReport(diffFound: true);
@@ -130,7 +131,8 @@ namespace ODiff
                 rightValue.GetType() == typeof(string))
                 return leftValue.Equals(rightValue);
 
-            if (leftValue.GetType().IsPrimitive)
+            if (leftValue.GetType().IsPrimitive ||
+                leftValue.GetType().IsEnum)
                 return leftValue.Equals(rightValue);
 
             if (leftValue.GetType() == rightValue.GetType())

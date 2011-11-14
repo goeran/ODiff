@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Compare_two_objects.cs" />
     <Compile Include="Fakes\FakeData.cs" />
+    <Compile Include="Fakes\Gender.cs" />
     <Compile Include="Fakes\Group.cs" />
     <Compile Include="Fakes\KnownPersons.cs" />
     <Compile Include="Fakes\Person.cs" />

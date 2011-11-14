@@ -80,6 +80,18 @@ namespace ODiff.Tests
             }
 
             [Test]
+            public void It_will_report_diff_on_public_Enum_properties()
+            {
+                var left = new Person {GenderProperty = Gender.Femal};
+                var right = new Person {GenderProperty = Gender.Male};
+
+                var report = Diff.ObjectValues(left, right);
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("obj.GenderProperty", report.Table[0].Member);
+            }
+
+            [Test]
             public void It_will_not_report_diff_on_object_references()
             {
                 var a = new Person { Children = new List<Person>() };
@@ -198,7 +210,8 @@ namespace ODiff.Tests
                 var steve = FakeData.KnownPersons.SteveJobs;
                 var steveExactCopy = ObjectCloner.Clone(steve);
 
-                Assert.IsFalse(Diff.ObjectValues(steve, steveExactCopy).DiffFound);
+                var report = Diff.ObjectValues(steve, steveExactCopy);
+                Assert.IsFalse(report.DiffFound);
             }
         }
 
