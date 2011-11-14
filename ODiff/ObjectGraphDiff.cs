@@ -46,7 +46,7 @@ namespace ODiff
             {
                 var leftValue = i >= leftList.Count ? null : leftList[i];
                 var rightValue = i >= rightList.Count ? null : rightList[i];
-                if (leftValue.IsPrimitiveValueOrString() &&
+                if (leftValue.IsValueType() &&
                     !AreEqual(leftValue, rightValue))
                 {
                         var listItemReport = new DiffReport(diffFound: true);
@@ -95,8 +95,8 @@ namespace ODiff
         private DiffReport CompareValue(object leftValue, object rightValue, string fieldName)
         {
             var report = new DiffReport();
-            if ((leftValue.IsPrimitiveValueOrString() &&
-                rightValue.IsPrimitiveValueOrString() ||
+            if ((leftValue.IsValueType() &&
+                rightValue.IsValueType() ||
                 leftValue.IsEnum() && rightValue.IsEnum()) &&
                 !AreEqual(leftValue, rightValue))
             {
@@ -119,20 +119,8 @@ namespace ODiff
             if (leftValue == null && rightValue == null) return true;
             if (leftValue == null || rightValue == null) return false;
 
-            if (leftValue.GetType() == typeof(int) &&
-                rightValue.GetType() == typeof(int))
-            {
-                var leftAsInt = (int)leftValue;
-                var rightAsInt = (int)rightValue;
-                return leftAsInt == rightAsInt;
-            }
-
-            if (leftValue.GetType() == typeof(string) &&
-                rightValue.GetType() == typeof(string))
-                return leftValue.Equals(rightValue);
-
-            if (leftValue.GetType().IsPrimitive ||
-                leftValue.GetType().IsEnum)
+            if (leftValue.IsValueType() ||
+                leftValue.IsEnum())
                 return leftValue.Equals(rightValue);
 
             if (leftValue.GetType() == rightValue.GetType())

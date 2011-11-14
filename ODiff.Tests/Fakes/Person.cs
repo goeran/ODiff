@@ -10,11 +10,12 @@ namespace ODiff.Tests.Fakes
         public int AgeProperty { get; set; }
         public List<Person> Children { get; set; }
         public Gender GenderProperty { get; set; }
+        public decimal HeightProperty { get; set; }
 
         public string NameField;
         public int AgeField;
         public List<string> Tags;
-        public Gender GenderField { get; set; }
-
+        public Gender GenderField;
+        public decimal HeightField;
     }
 }

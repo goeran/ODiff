@@ -62,12 +62,14 @@ namespace ODiff.Tests
             }
 
             [Test]
-            public void It_will_report_diff_on_public_int_properties()
+            public void It_will_report_diff_on_public_decimal_properties()
             {
-                var a = new Person {AgeProperty = 20};
-                var b = new Person {AgeProperty = 29};
+                var a = new Person {HeightProperty = 1.8m};
+                var b = new Person {HeightProperty = 2.10m};
 
-                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                var diff = Diff.ObjectValues(a, b);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+                Assert.AreEqual("obj.HeightProperty", diff.Table[0].Member);
             }
 
             [Test]
@@ -77,6 +79,12 @@ namespace ODiff.Tests
                 var b = new Person { AgeField = 29 };
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+            }
+
+            [Test]
+            public void It_will_report_diff_on_public_float_properties()
+            {
+                
             }
 
             [Test]

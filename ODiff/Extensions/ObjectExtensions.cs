@@ -20,9 +20,9 @@ namespace ODiff.Extensions
             return obj is IList;
         }
 
-        public static bool IsPrimitiveValueOrString(this object obj)
+        public static bool IsValueType(this object obj)
         {
-            return obj != null && (obj.GetType().IsPrimitive || obj is string);
+            return obj != null && (obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj is string);
         }
 
         public static bool IsEnum(this object obj)
