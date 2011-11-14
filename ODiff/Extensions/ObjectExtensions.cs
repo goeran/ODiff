@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Reflection;
 
 namespace ODiff.Extensions
@@ -22,7 +23,7 @@ namespace ODiff.Extensions
 
         public static bool IsValueType(this object obj)
         {
-            return obj != null && (obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj is string);
+            return obj != null && (obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj.GetType() == typeof(DateTime) || obj is string);
         }
 
         public static bool IsEnum(this object obj)

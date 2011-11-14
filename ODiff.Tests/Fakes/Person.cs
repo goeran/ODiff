@@ -12,6 +12,7 @@ namespace ODiff.Tests.Fakes
         public Gender GenderProperty { get; set; }
         public decimal HeightProperty { get; set; }
         public float WeightProperty { get; set; }
+        public DateTime BornProperty { get; set; }
 
         public string NameField;
         public int AgeField;
@@ -19,5 +20,6 @@ namespace ODiff.Tests.Fakes
         public Gender GenderField;
         public decimal HeightField;
         public float WeightField;
+        public DateTime BornField;
     }
 }

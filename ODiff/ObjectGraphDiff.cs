@@ -109,12 +109,14 @@ namespace ODiff
             if ((leftValue.IsValueType() &&
                 rightValue.IsValueType() ||
                 leftValue.IsEnum() && 
-                rightValue.IsEnum()) &&
-                !AreEqual(leftValue, rightValue))
+                rightValue.IsEnum()))
             {
-                var fieldReport = new DiffReport(diffFound: true);
-                fieldReport.ReportDiff(currentMemberPath + "." + fieldName, leftValue, rightValue);
-                report.Merge(fieldReport);
+                if (!AreEqual(leftValue, rightValue))
+                {
+                    var fieldReport = new DiffReport(diffFound: true);
+                    fieldReport.ReportDiff(currentMemberPath + "." + fieldName, leftValue, rightValue);
+                    report.Merge(fieldReport);
+                }
             }
             else
             {

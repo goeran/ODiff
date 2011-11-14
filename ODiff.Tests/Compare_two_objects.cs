@@ -145,6 +145,26 @@ namespace ODiff.Tests
             }
 
             [Test]
+            public void It_will_report_diff_on_public_DateTime_properties()
+            {
+                var left = new Person {BornProperty = new DateTime(1981, 10, 10)};
+                var right = new Person {BornProperty = new DateTime(1981, 10, 11)};
+
+                var diff = Diff.ObjectValues(left, right);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+            }
+
+            [Test]
+            public void It_will_report_diff_on_public_DateTime_fields()
+            {
+                var left = new Person { BornField = new DateTime(1981, 10, 10) };
+                var right = new Person { BornField = new DateTime(1982, 10, 10) };
+
+                var diff = Diff.ObjectValues(left, right);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+            }
+
+            [Test]
             public void It_will_not_report_diff_on_object_references()
             {
                 var a = new Person { Children = new List<Person>() };
