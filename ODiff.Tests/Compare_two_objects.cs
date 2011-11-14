@@ -92,6 +92,19 @@ namespace ODiff.Tests
             }
 
             [Test]
+            public void It_will_report_diff_on_public_Enum_fields()
+            {
+                var left = new Person { GenderField = Gender.Femal };
+                var right = new Person { GenderField = Gender.Male };
+
+                var report = Diff.ObjectValues(left, right);
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("obj.GenderField", report.Table[0].Member);
+                
+            }
+
+            [Test]
             public void It_will_not_report_diff_on_object_references()
             {
                 var a = new Person { Children = new List<Person>() };
