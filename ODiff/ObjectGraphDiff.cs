@@ -102,10 +102,10 @@ namespace ODiff
         private DiffReport Compare(object leftValue, object rightValue, string fieldName)
         {
             var report = new DiffReport();
-            if ((leftValue.IsValueType() &&
+            if (leftValue.IsValueType() ||
                 rightValue.IsValueType() ||
-                leftValue.IsEnum() && 
-                rightValue.IsEnum()))
+                leftValue.IsEnum() || 
+                rightValue.IsEnum())
             {
                 if (!AreEqual(leftValue, rightValue))
                 {

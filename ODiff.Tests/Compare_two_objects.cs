@@ -349,5 +349,32 @@ namespace ODiff.Tests
                 Assert.AreEqual("obj.Tags.Count", report.Table[1].Member);
             }
         }
+
+        [TestFixture]
+        public class When_dealing_with_nulls
+        {
+            [Test]
+            [Ignore("Not ready yet")]
+            public void It_will_deal_with_nulls_on_root_obj()
+            {
+                var left = "Bill";
+                Object right = null;
+
+                var diff = Diff.ObjectValues(left, right);
+                Assert.IsTrue(diff.DiffFound);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+            }
+
+            [Test]
+            public void It_can_deal_with_nulls_on_props()
+            {
+                var left = new Person {NameProperty = "Gøran"};
+                var right = new Person {NameProperty = null};
+
+                var diff = Diff.ObjectValues(left, right);
+                Assert.IsTrue(diff.DiffFound);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+            }
+        }
     }
 }
