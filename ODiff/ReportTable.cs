@@ -18,12 +18,7 @@ namespace ODiff
 
         public void AddRow(string property, object leftValue, object rightValue)
         {
-            rows.Add(new DiffReportTableRow
-            {
-                Member = property,
-                LeftValue = leftValue,
-                RightValue = rightValue
-            });
+            rows.Add(new DiffReportTableRow(property, leftValue, rightValue));
         }
 
         public void AddRows(ReportTable table)
