@@ -25,7 +25,12 @@ namespace ODiff
         private DiffReport LookInto(object leftObject, object rightObject)
         {
             if (leftObject == null && rightObject == null) return NoDiffFound();
-            if (leftObject == null || rightObject == null) return new DiffReport(diffFound: true);
+            if (leftObject == null || rightObject == null)
+            {
+                var reportOnObj = new DiffReport(diffFound: true);
+                reportOnObj.ReportDiff(currentMemberPath, leftObject, rightObject);
+                return reportOnObj;
+            }
 
             var report = new DiffReport();
 

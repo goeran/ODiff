@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace ODiff
 {
@@ -27,6 +28,25 @@ namespace ODiff
             {
                 rows.Add(row);
             }
+        }
+
+        public string Print()
+        {
+            var report = new StringBuilder();
+            foreach (var row in Rows)
+            {
+                var line = string.Format("{0}\t\t\tLeft={1}, Right={2}\r\n", 
+                    row.MemberPath, 
+                    Pretty(row.LeftValue), 
+                    Pretty(row.RightValue));
+                report.Append(line);
+            }
+            return report.ToString();
+        }
+
+        private string Pretty(object obj)
+        {
+            return obj == null ? "<null>" : obj.ToString();
         }
     }
 }

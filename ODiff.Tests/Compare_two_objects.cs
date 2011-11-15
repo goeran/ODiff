@@ -298,20 +298,22 @@ namespace ODiff.Tests
                 var steveCopy = ObjectCloner.Clone(steve) as Person;
                 steveCopy.Children.RemoveAt(0);
 
-                var report = Diff.ObjectValues(steve, steveCopy);
+                var diff = Diff.ObjectValues(steve, steveCopy);
+                Console.WriteLine(diff.Table.Print());
 
-                Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(10, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Children[0].NameField", report.Table[0].MemberPath);
-                Assert.AreEqual("obj.Children[0].AgeField", report.Table[1].MemberPath);
-                Assert.AreEqual("obj.Children[0].NameProperty", report.Table[2].MemberPath);
-                Assert.AreEqual("obj.Children[0].AgeProperty", report.Table[3].MemberPath);
-                Assert.AreEqual("obj.Children[1].NameField", report.Table[4].MemberPath);
-                Assert.AreEqual("obj.Children[1].AgeField", report.Table[5].MemberPath);
-                Assert.AreEqual("obj.Children[1].NameProperty", report.Table[6].MemberPath);
-                Assert.AreEqual("obj.Children[1].AgeProperty", report.Table[7].MemberPath);
-                Assert.AreEqual("obj.Children[2]", report.Table[8].MemberPath);
-                Assert.AreEqual("obj.Children.Count", report.Table[9].MemberPath);
+                Assert.IsTrue(diff.DiffFound);
+                Assert.AreEqual(11, diff.Table.Rows.Count());
+                Assert.AreEqual("obj.Children[0].NameField", diff.Table[0].MemberPath);
+                Assert.AreEqual("obj.Children[0].AgeField", diff.Table[1].MemberPath);
+                Assert.AreEqual("obj.Children[0].NameProperty", diff.Table[2].MemberPath);
+                Assert.AreEqual("obj.Children[0].AgeProperty", diff.Table[3].MemberPath);
+                Assert.AreEqual("obj.Children[1].NameField", diff.Table[4].MemberPath);
+                Assert.AreEqual("obj.Children[1].AgeField", diff.Table[5].MemberPath);
+                Assert.AreEqual("obj.Children[1].NameProperty", diff.Table[6].MemberPath);
+                Assert.AreEqual("obj.Children[1].AgeProperty", diff.Table[7].MemberPath);
+                Assert.AreEqual("obj.Children[1].Children", diff.Table[8].MemberPath);
+                Assert.AreEqual("obj.Children[2]", diff.Table[9].MemberPath);
+                Assert.AreEqual("obj.Children.Count", diff.Table[10].MemberPath);
             }
 
             [Test]
@@ -354,13 +356,13 @@ namespace ODiff.Tests
         public class When_dealing_with_nulls
         {
             [Test]
-            [Ignore("Not ready yet")]
             public void It_will_deal_with_nulls_on_root_obj()
             {
                 var left = "Bill";
                 Object right = null;
 
                 var diff = Diff.ObjectValues(left, right);
+
                 Assert.IsTrue(diff.DiffFound);
                 Assert.AreEqual(1, diff.Table.Rows.Count());
             }
