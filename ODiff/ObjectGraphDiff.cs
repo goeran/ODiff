@@ -9,7 +9,7 @@ namespace ODiff
         private readonly object leftRoot;
         private readonly object rightRoot;
         private string currentMemberPath = "obj";
-        private string previousMemberName;
+        private string previousMemberName = "obj";
 
         public ObjectGraphDiff(Object leftRoot, Object rightRoot)
         {
@@ -19,10 +19,10 @@ namespace ODiff
 
         public DiffReport Diff()
         {
-            return CompareObject(leftRoot, rightRoot);
+            return LookInto(leftRoot, rightRoot);
         }
 
-        private DiffReport CompareObject(object leftObject, object rightObject)
+        private DiffReport LookInto(object leftObject, object rightObject)
         {
             if (leftObject == null && rightObject == null) return NoDiffFound();
             if (leftObject == null || rightObject == null) return new DiffReport(diffFound: true);
@@ -42,6 +42,7 @@ namespace ODiff
         {
             var report = new DiffReport();
             var largestList = leftList.Count >= rightList.Count ? leftList : rightList;
+            var memberPathBeforeIteration = currentMemberPath;
             for (var i = 0; i < largestList.Count; i++)
             {
                 var leftValue = i >= leftList.Count ? null : leftList[i];
@@ -63,9 +64,9 @@ namespace ODiff
                 }
                 else
                 {
-                    report.Merge(CompareObject(leftValue, rightValue));
+                    report.Merge(LookInto(leftValue, rightValue));
                 }
-                PreviousGraphPath();
+                currentMemberPath = memberPathBeforeIteration;
             }
             return report;
         }
@@ -74,11 +75,6 @@ namespace ODiff
         {
             previousMemberName = currentMemberPath;
             currentMemberPath = path;
-        }
-
-        private void PreviousGraphPath()
-        {
-            currentMemberPath = previousMemberName;
         }
 
         private static DiffReport NoDiffFound()
@@ -98,12 +94,12 @@ namespace ODiff
                 var leftValue = leftFields[i].GetValue(leftObject);
                 var rightValue = rightFields[i].GetValue(rightObject);
 
-                diffReport.Merge(CompareValue(leftValue, rightValue, fieldName));
+                diffReport.Merge(Compare(leftValue, rightValue, fieldName));
             }
             return diffReport;
         }
 
-        private DiffReport CompareValue(object leftValue, object rightValue, string fieldName)
+        private DiffReport Compare(object leftValue, object rightValue, string fieldName)
         {
             var report = new DiffReport();
             if ((leftValue.IsValueType() &&
@@ -122,7 +118,7 @@ namespace ODiff
             {
                 var previousMemberName = currentMemberPath;
                 currentMemberPath += "." + fieldName;
-                report.Merge(CompareObject(leftValue, rightValue));
+                report.Merge(LookInto(leftValue, rightValue));
                 currentMemberPath = previousMemberName;
             }
             return report;
@@ -157,7 +153,7 @@ namespace ODiff
                     var leftValue = leftProperty.GetValue(leftObject);
                     var rightValue = rightProperty.GetValue(rightObject);
 
-                    diffReport.Merge(CompareValue(leftValue, rightValue, leftProperty.Name));
+                    diffReport.Merge(Compare(leftValue, rightValue, leftProperty.Name));
                 }
             }
             return diffReport;

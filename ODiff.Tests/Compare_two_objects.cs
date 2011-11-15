@@ -301,14 +301,34 @@ namespace ODiff.Tests
                 var report = Diff.ObjectValues(steve, steveCopy);
 
                 Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(6, report.Table.Rows.Count());
+                Assert.AreEqual(10, report.Table.Rows.Count());
                 Assert.AreEqual("obj.Children[0].NameField", report.Table[0].Member);
                 Assert.AreEqual("obj.Children[0].AgeField", report.Table[1].Member);
                 Assert.AreEqual("obj.Children[0].NameProperty", report.Table[2].Member);
                 Assert.AreEqual("obj.Children[0].AgeProperty", report.Table[3].Member);
-                Assert.AreEqual("obj.Children[1]", report.Table[4].Member);
-                Assert.AreEqual("obj.Children.Count", report.Table[5].Member);
-            }            
+                Assert.AreEqual("obj.Children[1].NameField", report.Table[4].Member);
+                Assert.AreEqual("obj.Children[1].AgeField", report.Table[5].Member);
+                Assert.AreEqual("obj.Children[1].NameProperty", report.Table[6].Member);
+                Assert.AreEqual("obj.Children[1].AgeProperty", report.Table[7].Member);
+                Assert.AreEqual("obj.Children[2]", report.Table[8].Member);
+                Assert.AreEqual("obj.Children.Count", report.Table[9].Member);
+            }
+
+            [Test]
+            public void It_will_handle_lists_of_lists()
+            {
+                var listOfLists = new List<List<string>>();
+                listOfLists.Add(new List<string> { "one", "two", "three" });
+                listOfLists.Add(new List<string> { "four", "five", "six" });
+                var listOfListsCopy = ObjectCloner.Clone(listOfLists) as List<List<string>>;
+                listOfListsCopy.Last().RemoveAt(0);
+                listOfListsCopy.Last().Insert(0, "four edited");
+
+                var diff = Diff.ObjectValues(listOfLists, listOfListsCopy);
+                Assert.AreEqual("four edited", listOfListsCopy[1][0]);
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+                Assert.AreEqual("obj[1][0]", diff.Table[0].Member);
+            }
         }
 
         [TestFixture]

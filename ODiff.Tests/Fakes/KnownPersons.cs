@@ -39,6 +39,23 @@ namespace ODiff.Tests.Fakes
                             AgeProperty = 32,
                             NameField = "LarryEllison",
                             AgeField = 32
+                        },
+                        new Person
+                        {
+                            NameProperty = "Lisa Brennan-Jobs",
+                            AgeProperty = 35,
+                            NameField = "Lista Brennan-Jobs",
+                            AgeField = 35,
+                            Children = new List<Person>
+                            {
+                                new Person
+                                {
+                                    NameProperty = "Machintosh Brennan",
+                                    AgeProperty = 15,
+                                    NameField = "Machintosh Brennan",
+                                    AgeField = 15
+                                }
+                            }
                         }
                     },
                     Tags = new List<string>
