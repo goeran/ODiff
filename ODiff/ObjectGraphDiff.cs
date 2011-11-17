@@ -44,7 +44,6 @@ namespace ODiff
             {
                 report.Merge(VisitElementsInList(memberPath, leftObject as IList, rightObject as IList));
             }
-
             report.Merge(VisitPublicFields(memberPath, leftObject, rightObject));
             report.Merge(VisitPublicProperties(memberPath, leftObject, rightObject));
             return report;
