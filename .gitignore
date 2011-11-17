@@ -6,3 +6,4 @@ bin
 debug
 *.suo
 obj
+*.vspscc
