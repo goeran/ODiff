@@ -8,8 +8,8 @@ namespace ODiff
     {
         private readonly object leftRoot;
         private readonly object rightRoot;
-        private string currentMemberPath = "obj";
-        private string previousMemberName = "obj";
+        private string currentMemberPath = "";
+        private string previousMemberName = "";
 
         public ObjectGraphDiff(Object leftRoot, Object rightRoot)
         {
@@ -27,7 +27,7 @@ namespace ODiff
             if (leftObject == null && rightObject == null) return NoDiffFound();
             if (leftObject == null || rightObject == null)
             {
-                var reportOnObj = new DiffReport(diffFound: true);
+                var reportOnObj = new DiffReport();
                 reportOnObj.ReportDiff(currentMemberPath, leftObject, rightObject);
                 return reportOnObj;
             }
@@ -57,13 +57,13 @@ namespace ODiff
                 if (leftValue.IsValueType() &&
                     !AreEqual(leftValue, rightValue))
                 {
-                    var listItemReport = new DiffReport(diffFound: true);
+                    var listItemReport = new DiffReport();
                     listItemReport.ReportDiff(currentMemberPath, leftValue, rightValue);
                     report.Merge(listItemReport);
                 }
                 else if (leftValue == null || rightValue == null)
                 {
-                    var missingItemReport = new DiffReport(diffFound: true);
+                    var missingItemReport = new DiffReport();
                     missingItemReport.ReportDiff(currentMemberPath, leftValue, rightValue);
                     report.Merge(missingItemReport);
                 }
@@ -84,7 +84,7 @@ namespace ODiff
 
         private static DiffReport NoDiffFound()
         {
-            return new DiffReport(diffFound: false);
+            return new DiffReport();
         }
 
         private DiffReport ComparePublicFields(object leftObject, object rightObject)
@@ -114,15 +114,17 @@ namespace ODiff
             {
                 if (!AreEqual(leftValue, rightValue))
                 {
-                    var fieldReport = new DiffReport(diffFound: true);
-                    fieldReport.ReportDiff(currentMemberPath + "." + fieldName, leftValue, rightValue);
+                    var fieldReport = new DiffReport();
+                    var prefixMember = (currentMemberPath != "") ? currentMemberPath + "." : "";
+                    fieldReport.ReportDiff(prefixMember + fieldName, leftValue, rightValue);
                     report.Merge(fieldReport);
                 }
             }
             else
             {
                 var previousMemberName = currentMemberPath;
-                currentMemberPath += "." + fieldName;
+                var prefixMember = (currentMemberPath != "") ? currentMemberPath + "." : "";
+                currentMemberPath = prefixMember + fieldName;
                 report.Merge(LookInto(leftValue, rightValue));
                 currentMemberPath = previousMemberName;
             }

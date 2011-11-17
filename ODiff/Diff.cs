@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using ODiff.Extensions;
-
-namespace ODiff
+﻿namespace ODiff
 {
     public class Diff
     {

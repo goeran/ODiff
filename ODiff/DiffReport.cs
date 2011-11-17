@@ -1,31 +1,24 @@
-﻿namespace ODiff
+﻿using System.Linq;
+using System.Text;
+
+namespace ODiff
 {
     public class DiffReport
     {
-        private readonly ReportTable table = new ReportTable();
+        private readonly DiffReportTable table = new DiffReportTable();
 
-        public DiffReport()
+        public bool DiffFound
         {
+            get { return table.Rows.Count() > 0; }
         }
 
-        public DiffReport(bool diffFound)
-        {
-            DiffFound = diffFound;
-        }
-
-        public bool DiffFound { get; private set; }
-
-        public ReportTable Table
+        public DiffReportTable Table
         {
             get { return table; }
         }
 
         public void Merge(DiffReport anotherResult)
         {
-            if (!DiffFound)
-            {
-                DiffFound = anotherResult.DiffFound;
-            }
             table.AddRows(anotherResult.Table);
         }
 
@@ -33,5 +26,30 @@
         {
             table.AddRow(property, leftValue, rightValue);
         }
+
+        public string Print()
+        {
+            var report = new StringBuilder();
+            foreach (var row in Table.Rows)
+            {
+                var line = string.Format("{0}\t\t\tLeft={1}, Right={2}\r\n",
+                    row.MemberPath,
+                    Pretty(row.LeftValue),
+                    Pretty(row.RightValue));
+                report.Append(line);
+            }
+            return report.ToString();
+        }
+
+        private string Pretty(object obj)
+        {
+            return obj == null ? "<null>" : obj.ToString();
+        }
+
+        public void SetFilter(params IDiffFilter[] newFilters)
+        {
+            table.SetFilter(newFilters);
+        }
+
     }
 }

@@ -69,7 +69,7 @@ namespace ODiff.Tests
 
                 var diff = Diff.ObjectValues(a, b);
                 Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("obj.HeightProperty", diff.Table[0].MemberPath);
+                Assert.AreEqual("HeightProperty", diff.Table[0].MemberPath);
             }
 
             [Test]
@@ -80,7 +80,7 @@ namespace ODiff.Tests
 
                 var diff = Diff.ObjectValues(a, b);
                 Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("obj.HeightField", diff.Table[0].MemberPath);
+                Assert.AreEqual("HeightField", diff.Table[0].MemberPath);
             }
 
             [Test]
@@ -128,7 +128,7 @@ namespace ODiff.Tests
                 var report = Diff.ObjectValues(left, right);
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj.GenderProperty", report.Table[0].MemberPath);
+                Assert.AreEqual("GenderProperty", report.Table[0].MemberPath);
             }
 
             [Test]
@@ -140,7 +140,7 @@ namespace ODiff.Tests
                 var report = Diff.ObjectValues(left, right);
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj.GenderField", report.Table[0].MemberPath);
+                Assert.AreEqual("GenderField", report.Table[0].MemberPath);
                 
             }
 
@@ -209,10 +209,10 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(4, report.Table.Rows.Count());
-                Assert.AreEqual("obj.NameField", report.Table[0].MemberPath);
-                Assert.AreEqual("obj.AgeField", report.Table[1].MemberPath);
-                Assert.AreEqual("obj.NameProperty", report.Table[2].MemberPath);
-                Assert.AreEqual("obj.AgeProperty", report.Table[3].MemberPath);
+                Assert.AreEqual("NameField", report.Table[0].MemberPath);
+                Assert.AreEqual("AgeField", report.Table[1].MemberPath);
+                Assert.AreEqual("NameProperty", report.Table[2].MemberPath);
+                Assert.AreEqual("AgeProperty", report.Table[3].MemberPath);
             }
         }
 
@@ -229,7 +229,7 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(2, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Count", report.Table[1].MemberPath);
+                Assert.AreEqual("Count", report.Table[1].MemberPath);
                 Assert.AreEqual(1, report.Table[1].LeftValue);
                 Assert.AreEqual(2, report.Table[1].RightValue);
             }
@@ -244,7 +244,7 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj[1]", report.Table[0].MemberPath);
+                Assert.AreEqual("[1]", report.Table[0].MemberPath);
             }
 
             [Test]
@@ -257,7 +257,7 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("obj[0].NameProperty", report.Table[0].MemberPath);
+                Assert.AreEqual("[0].NameProperty", report.Table[0].MemberPath);
             }
 
             [Test]
@@ -269,8 +269,8 @@ namespace ODiff.Tests
                 var report = Diff.ObjectValues(left, right);
 
                 Assert.AreEqual(2, report.Table.Rows.Count());
-                Assert.AreEqual("obj[0][1]", report.Table[0].MemberPath);
-                Assert.AreEqual("obj[0].Count", report.Table[1].MemberPath);
+                Assert.AreEqual("[0][1]", report.Table[0].MemberPath);
+                Assert.AreEqual("[0].Count", report.Table[1].MemberPath);
             }
         }
 
@@ -299,21 +299,21 @@ namespace ODiff.Tests
                 steveCopy.Children.RemoveAt(0);
 
                 var diff = Diff.ObjectValues(steve, steveCopy);
-                Console.WriteLine(diff.Table.Print());
+                Console.WriteLine(diff.Print());
 
                 Assert.IsTrue(diff.DiffFound);
                 Assert.AreEqual(11, diff.Table.Rows.Count());
-                Assert.AreEqual("obj.Children[0].NameField", diff.Table[0].MemberPath);
-                Assert.AreEqual("obj.Children[0].AgeField", diff.Table[1].MemberPath);
-                Assert.AreEqual("obj.Children[0].NameProperty", diff.Table[2].MemberPath);
-                Assert.AreEqual("obj.Children[0].AgeProperty", diff.Table[3].MemberPath);
-                Assert.AreEqual("obj.Children[1].NameField", diff.Table[4].MemberPath);
-                Assert.AreEqual("obj.Children[1].AgeField", diff.Table[5].MemberPath);
-                Assert.AreEqual("obj.Children[1].NameProperty", diff.Table[6].MemberPath);
-                Assert.AreEqual("obj.Children[1].AgeProperty", diff.Table[7].MemberPath);
-                Assert.AreEqual("obj.Children[1].Children", diff.Table[8].MemberPath);
-                Assert.AreEqual("obj.Children[2]", diff.Table[9].MemberPath);
-                Assert.AreEqual("obj.Children.Count", diff.Table[10].MemberPath);
+                Assert.AreEqual("Children[0].NameField", diff.Table[0].MemberPath);
+                Assert.AreEqual("Children[0].AgeField", diff.Table[1].MemberPath);
+                Assert.AreEqual("Children[0].NameProperty", diff.Table[2].MemberPath);
+                Assert.AreEqual("Children[0].AgeProperty", diff.Table[3].MemberPath);
+                Assert.AreEqual("Children[1].NameField", diff.Table[4].MemberPath);
+                Assert.AreEqual("Children[1].AgeField", diff.Table[5].MemberPath);
+                Assert.AreEqual("Children[1].NameProperty", diff.Table[6].MemberPath);
+                Assert.AreEqual("Children[1].AgeProperty", diff.Table[7].MemberPath);
+                Assert.AreEqual("Children[1].Children", diff.Table[8].MemberPath);
+                Assert.AreEqual("Children[2]", diff.Table[9].MemberPath);
+                Assert.AreEqual("Children.Count", diff.Table[10].MemberPath);
             }
 
             [Test]
@@ -329,7 +329,7 @@ namespace ODiff.Tests
                 var diff = Diff.ObjectValues(listOfLists, listOfListsCopy);
                 Assert.AreEqual("four edited", listOfListsCopy[1][0]);
                 Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("obj[1][0]", diff.Table[0].MemberPath);
+                Assert.AreEqual("[1][0]", diff.Table[0].MemberPath);
             }
         }
 
@@ -347,8 +347,8 @@ namespace ODiff.Tests
 
                 Assert.IsTrue(report.DiffFound);
                 Assert.AreEqual(2, report.Table.Rows.Count());
-                Assert.AreEqual("obj.Tags[3]", report.Table[0].MemberPath);
-                Assert.AreEqual("obj.Tags.Count", report.Table[1].MemberPath);
+                Assert.AreEqual("Tags[3]", report.Table[0].MemberPath);
+                Assert.AreEqual("Tags.Count", report.Table[1].MemberPath);
             }
         }
 
