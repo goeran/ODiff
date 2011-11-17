@@ -113,33 +113,6 @@ namespace ODiff
             return diffReport;
         }
 
-        private DiffReport Compare(object leftValue, object rightValue, string fieldName)
-        {
-            var report = new DiffReport();
-            if (leftValue.IsValueType() ||
-                rightValue.IsValueType() ||
-                leftValue.IsEnum() || 
-                rightValue.IsEnum())
-            {
-                if (!AreEqual(leftValue, rightValue))
-                {
-                    var fieldReport = new DiffReport();
-                    var prefixMember = (currentMemberPath != "") ? currentMemberPath + "." : "";
-                    fieldReport.ReportDiff(prefixMember + fieldName, leftValue, rightValue);
-                    report.Merge(fieldReport);
-                }
-            }
-            else
-            {
-                var previousMemberName = currentMemberPath;
-                var prefixMember = (currentMemberPath != "") ? currentMemberPath + "." : "";
-                currentMemberPath = prefixMember + fieldName;
-                report.Merge(VisitNode(leftValue, rightValue));
-                currentMemberPath = previousMemberName;
-            }
-            return report;
-        }
-
         private static bool AreEqual(object leftValue, object rightValue)
         {
             if (leftValue == null && rightValue == null) return true;
