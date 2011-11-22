@@ -176,7 +176,7 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_object_references_when_left_is_null()
             {
-                var a = new Person {};
+                var a = new Person();
                 var b = new Person {Children = new List<Person>()};
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
@@ -295,7 +295,7 @@ namespace ODiff.Tests
             public void It_will_recursively_compare_all_members_of_list()
             {
                 var steve = FakeData.KnownPersons.SteveJobs;
-                var steveCopy = ObjectCloner.Clone(steve) as Person;
+                var steveCopy = (Person)ObjectCloner.Clone(steve);
                 steveCopy.Children.RemoveAt(0);
 
                 var diff = Diff.ObjectValues(steve, steveCopy);
@@ -322,7 +322,7 @@ namespace ODiff.Tests
                 var listOfLists = new List<List<string>>();
                 listOfLists.Add(new List<string> { "one", "two", "three" });
                 listOfLists.Add(new List<string> { "four", "five", "six" });
-                var listOfListsCopy = ObjectCloner.Clone(listOfLists) as List<List<string>>;
+                var listOfListsCopy = (List<List<string>>)ObjectCloner.Clone(listOfLists);
                 listOfListsCopy.Last().RemoveAt(0);
                 listOfListsCopy.Last().Insert(0, "four edited");
 
@@ -340,7 +340,7 @@ namespace ODiff.Tests
             public void It_will_compare_all_members_in_list()
             {
                 var steve = FakeData.KnownPersons.SteveJobs;
-                var steveCopy = ObjectCloner.Clone(steve) as Person;
+                var steveCopy = (Person)ObjectCloner.Clone(steve);
                 steveCopy.Tags.Add("phones");
 
                 var report = Diff.ObjectValues(steve, steveCopy);
@@ -350,6 +350,21 @@ namespace ODiff.Tests
                 Assert.AreEqual("Tags[3]", report.Table[0].MemberPath);
                 Assert.AreEqual("Tags.Count", report.Table[1].MemberPath);
             }
+
+            [Test]
+            public void It_will_compare_all_members_in_enumerable_collection()
+            {
+                var steve = FakeData.KnownPersons.SteveJobs;
+                var steveCopy = (Person)ObjectCloner.Clone(steve);
+                steveCopy.AddPhone("97122644");
+
+                var report = Diff.ObjectValues(steve, steveCopy);
+
+                Assert.IsTrue(report.DiffFound);
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("Phones[0]", report.Table[0].MemberPath);
+            }
+
         }
 
         [TestFixture]
@@ -358,7 +373,7 @@ namespace ODiff.Tests
             [Test]
             public void It_will_deal_with_nulls_on_root_obj()
             {
-                var left = "Bill";
+                const string left = "Bill";
                 Object right = null;
 
                 var diff = Diff.ObjectValues(left, right);
@@ -378,5 +393,125 @@ namespace ODiff.Tests
                 Assert.AreEqual(1, diff.Table.Rows.Count());
             }
         }
+
+        [TestFixture]
+        public class When_intercept_nodes
+        {
+            [Test]
+            public void It_can_intercept_based_on_member_path()
+            {
+                var interceptor = new MemberPathInterceptor<string>("^NameField$",
+                    input => input.ToUpper());
+
+                var left = new Person { NameField = "Gøran", NameProperty = "Gøran" };
+                var right = new Person { NameField = "Torkild", NameProperty = "Torkild" };
+                var diff = Diff.ObjectValues(left, right, interceptor);
+
+                Assert.AreEqual("GØRAN", diff.Table[0].LeftValue);
+                Assert.AreEqual("TORKILD", diff.Table[0].RightValue);
+                Assert.AreEqual("Gøran", diff.Table[1].LeftValue);
+                Assert.AreEqual("Torkild", diff.Table[1].RightValue);
+            }
+
+            [Test]
+            public void It_will_not_intercept_invalid_type_when_intercept_by_member_path()
+            {
+                var interceptor = new MemberPathInterceptor<int>("^NameField$",
+                    input => input + 10);
+
+                var left = new Person { NameField = "Gøran", NameProperty = "Gøran" };
+                var right = new Person { NameField = "Torkild", NameProperty = "Torkild" };
+                
+                var diff = Diff.ObjectValues(left, right, interceptor);
+
+                Assert.AreEqual(2, diff.Table.Rows.Count());
+            }
+
+            [Test]
+            public void It_can_intercept_on_node_type()
+            {
+                var interceptor = new TypeInterceptor<int>(input => input + 1);
+
+                var left = new Person { NameField = "Gøran", WeightField = 70, AgeField = 20, AgeProperty = 20};
+                var right = new Person { NameField = "Torkild", WeightField = 80, AgeField = 30, AgeProperty = 30};
+
+                var diff = Diff.ObjectValues(left, right, interceptor);
+                Assert.AreEqual(4, diff.Table.Rows.Count());
+                Assert.AreEqual("Gøran", diff.Table[0].LeftValue);
+                Assert.AreEqual("Torkild", diff.Table[0].RightValue);
+                Assert.AreEqual(21, diff.Table[1].LeftValue);
+                Assert.AreEqual(31, diff.Table[1].RightValue);
+                Assert.AreEqual(70, diff.Table[2].LeftValue);
+                Assert.AreEqual(80, diff.Table[2].RightValue);
+                Assert.AreEqual(21, diff.Table[3].LeftValue);
+                Assert.AreEqual(31, diff.Table[3].RightValue);
+            }
+
+            [Test]
+            public void It_can_handle_a_relatively_large_object_graph()
+            {
+                const int generations = 1000;
+                Person left = null;
+                Person right = null;
+
+                Measure("Building test set:", () =>
+                {
+                    left = new Person();
+                    Generations(generations, left);
+                    right = new Person();
+                    Generations(generations, right);
+                });
+
+                Measure("Diff", () =>
+                {
+                    var diff = Diff.ObjectValues(left, right, new TypeInterceptor<string>(input =>
+                    {
+                        return input;
+                    }));
+
+                    Assert.AreEqual(0, diff.Table.Rows.Count());
+                });
+            }
+
+            [Test]
+            public void It_should_be_possible_to_intercept_lists()
+            {
+                var left = new Person();
+                left.Children = new List<Person>();
+                var right = new Person();
+                right.Children = new List<Person>();
+
+                var numberOfInterceptions = 0;
+                var listInterceptor = new TypeInterceptor<IEnumerable<Person>>(input =>
+                {
+                    numberOfInterceptions++;
+                    return input;
+                });
+
+                Diff.ObjectValues(left, right, listInterceptor);
+                Assert.AreEqual(2, numberOfInterceptions);
+            }
+
+            private static void Generations(int depth, Person person)
+            {
+                if (depth == 0) return;
+                var newChild = new Person();
+                person.Children = new List<Person>();
+                for (int i = 0; i < 100; i++)
+                {
+                    person.Children.Add(new Person());
+                }
+                Generations(depth - 1, newChild);
+            }
+
+            private static void Measure(string prefix, Action codeblock)
+            {
+                var start = DateTime.Now;
+                codeblock();
+                var end = DateTime.Now;
+                Console.WriteLine("{0}: {1}", prefix, end.Subtract(start));
+            }
+        }
+
     }
 }

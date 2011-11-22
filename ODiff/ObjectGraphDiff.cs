@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using ODiff.Extensions;
 
 namespace ODiff
@@ -8,55 +10,75 @@ namespace ODiff
     {
         private readonly object leftRoot;
         private readonly object rightRoot;
+        private readonly List<INodeInterceptor> nodeInterceptors = new List<INodeInterceptor>();
+        private readonly DiffReport report;
 
-        public ObjectGraphDiff(Object leftRoot, Object rightRoot)
+        public ObjectGraphDiff(Object leftRoot, Object rightRoot, params INodeInterceptor[] interceptors)
         {
+            report = NoDiffFound();
             this.rightRoot = rightRoot;
             this.leftRoot = leftRoot;
+            nodeInterceptors.AddRange(interceptors);
         }
 
         public DiffReport Diff()
         {
-            return VisitNode("", leftRoot, rightRoot);
-        }
-
-        private DiffReport VisitNode(string memberPath, object leftObject, object rightObject)
-        {
-            if (leftObject == null && rightObject == null) return NoDiffFound();
-            
-            var report = new DiffReport();
-
-            if (leftObject == null || rightObject == null)
-            {
-                report.ReportDiff(memberPath, leftObject, rightObject);
-                return report;
-            }
-
-            if (leftObject.IsValueType() || rightObject.IsValueType() ||
-                leftObject.IsEnum() || rightObject.IsEnum())
-            {
-                if (!AreEqual(leftObject, rightObject))
-                    report.ReportDiff(memberPath, leftObject, rightObject);
-                return report;
-            }
-
-            if (leftObject.IsList() && rightObject.IsList())
-            {
-                report.Merge(VisitElementsInList(memberPath, leftObject as IList, rightObject as IList));
-            }
-            report.Merge(VisitPublicFields(memberPath, leftObject, rightObject));
-            report.Merge(VisitPublicProperties(memberPath, leftObject, rightObject));
+            VisitNode("", leftRoot, rightRoot);
             return report;
         }
 
-        private DiffReport VisitElementsInList(string currentMemberPath, IList leftList, IList rightList)
+        private void VisitNode(string memberPath, object left, object right)
         {
-            var report = new DiffReport();
-            var largestList = leftList.Count >= rightList.Count ? leftList : rightList;
-            for (var i = 0; i < largestList.Count; i++)
+            left = InterceptNode(memberPath, left);
+            right = InterceptNode(memberPath, right);
+
+            if (left == null && right == null) 
+                return;
+
+            if (left == null || right == null)
             {
-                var leftValue = i >= leftList.Count ? null : leftList[i];
-                var rightValue = i >= rightList.Count ? null : rightList[i];
+                report.ReportDiff(memberPath, left, right);
+                return;
+            }
+
+            if (left.IsAValue() || right.IsAValue())
+            {
+                if (!AreEqual(left, right))
+                    report.ReportDiff(memberPath, left, right);
+                return;
+            }
+
+            if (left.IsEnumerable() && right.IsEnumerable())
+                VisitElementsInList(memberPath, left as IEnumerable, right as IEnumerable);
+            VisitPublicFields(memberPath, left, right);
+            VisitPublicProperties(memberPath, left, right);
+        }
+
+        private object InterceptNode(string memberPath, object node)
+        {
+            var interceptorsToRun = nodeInterceptors.Where(interceptor => interceptor.Use(memberPath, node));
+            var result = node;
+            foreach (var nodeInterceptor in interceptorsToRun)
+            {
+                result = nodeInterceptor.Intercept(result);
+            }
+            return result;
+        }
+
+        private void VisitElementsInList(string currentMemberPath, IEnumerable leftList, IEnumerable rightList)
+        {
+            var leftCount = leftList.Count();
+            var rightCount = rightList.Count();
+
+            var largestCount = Math.Max(leftCount, rightCount);
+            var leftEnumerator = leftList.GetEnumerator();
+            var rightEnumerator = rightList.GetEnumerator();
+
+            for (var i = 0; i < largestCount; i++)
+            {
+                var leftValue = GetNextValueOrNullFromList(leftEnumerator, i, leftCount);
+                var rightValue = GetNextValueOrNullFromList(rightEnumerator, i, rightCount);
+
                 var newMemberPath = currentMemberPath + "[" + i + "]";
 
                 if (leftValue == null || rightValue == null)
@@ -66,21 +88,25 @@ namespace ODiff
                     report.Merge(missingItemReport);
                 }
                 else
-                {
-                    report.Merge(VisitNode(newMemberPath, leftValue, rightValue));
-                }
+                    VisitNode(newMemberPath, leftValue, rightValue);
             }
-            return report;
         }
 
-        private static DiffReport NoDiffFound()
+        private static object GetNextValueOrNullFromList(IEnumerator enumerator, int currentIndex, int enumeratorCount)
         {
-            return new DiffReport();
+            object currentValue;
+            if (currentIndex < enumeratorCount)
+            {
+                enumerator.MoveNext();
+                currentValue = enumerator.Current;
+            }
+            else
+                currentValue = null;
+            return currentValue;
         }
 
-        private DiffReport VisitPublicFields(string currentMemberPath, object leftObject, object rightObject)
+        private void VisitPublicFields(string currentMemberPath, object leftObject, object rightObject)
         {
-            var diffReport = new DiffReport();
             var leftFields = leftObject.PublicFields();
             var rightFields = rightObject.PublicFields();
 
@@ -91,26 +117,12 @@ namespace ODiff
                 var rightValue = rightFields[i].GetValue(rightObject);
 
                 var newMemberPath = NewPath(currentMemberPath, fieldName);
-                diffReport.Merge(VisitNode(newMemberPath, leftValue, rightValue));
+                VisitNode(newMemberPath, leftValue, rightValue);
             }
-            return diffReport;
         }
 
-        private static bool AreEqual(object leftValue, object rightValue)
+        private void VisitPublicProperties(string currentMemberPath, object leftObject, object rightObject)
         {
-            if (leftValue == null && rightValue == null) return true;
-            if (leftValue == null || rightValue == null) return false;
-
-            if (leftValue.IsValueType() ||
-                leftValue.IsEnum())
-                return leftValue.Equals(rightValue);
-
-            return true;
-        }
-
-        private DiffReport VisitPublicProperties(string currentMemberPath, object leftObject, object rightObject)
-        {
-            var diffReport = new DiffReport();
             var leftGetterProps = leftObject.PublicGetterProperties();
             var rightGetterProps = rightObject.PublicGetterProperties();
 
@@ -126,16 +138,33 @@ namespace ODiff
                     var rightValue = rightProperty.GetValue(rightObject);
 
                     var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
-                    diffReport.Merge(VisitNode(newMemberPath, leftValue, rightValue));
+                    VisitNode(newMemberPath, leftValue, rightValue);
                 }
             }
-            return diffReport;
+        }
+
+
+        private static bool AreEqual(object leftValue, object rightValue)
+        {
+            if (leftValue == null && rightValue == null) return true;
+            if (leftValue == null || rightValue == null) return false;
+
+            if (leftValue.IsValueType() ||
+                leftValue.IsEnum())
+                return leftValue.Equals(rightValue);
+
+            return true;
         }
 
         private static string NewPath(string currentPath, string name)
         {
             var prefixMember = (currentPath != "") ? currentPath + "." : "";
             return prefixMember + name;
+        }
+
+        private static DiffReport NoDiffFound()
+        {
+            return new DiffReport();
         }
     }
 }

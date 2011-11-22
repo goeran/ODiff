@@ -21,6 +21,11 @@ namespace ODiff.Extensions
             return obj is IList;
         }
 
+        public static bool IsEnumerable(this object obj)
+        {
+            return obj is IEnumerable;
+        }
+
         public static bool IsValueType(this object obj)
         {
             return obj != null && (obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj.GetType() == typeof(DateTime) || obj is string);
@@ -29,6 +34,11 @@ namespace ODiff.Extensions
         public static bool IsEnum(this object obj)
         {
             return obj != null && obj.GetType().IsEnum;
+        }
+
+        public static bool IsAValue(this object obj)
+        {
+            return obj.IsValueType() || obj.IsEnum();
         }
     }
 }
