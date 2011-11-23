@@ -123,7 +123,7 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_public_Enum_properties()
             {
-                var left = new Person {GenderProperty = Gender.Femal};
+                var left = new Person {GenderProperty = Gender.Female};
                 var right = new Person {GenderProperty = Gender.Male};
 
                 var report = Diff.ObjectValues(left, right);
@@ -135,7 +135,7 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_public_Enum_fields()
             {
-                var left = new Person { GenderField = Gender.Femal };
+                var left = new Person { GenderField = Gender.Female };
                 var right = new Person { GenderField = Gender.Male };
 
                 var report = Diff.ObjectValues(left, right);

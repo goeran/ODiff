@@ -12,7 +12,7 @@ namespace ODiff.Tests.Learning
             [Test]
             public void How_to_figure_out_if_an_value_is_an_enum()
             {
-                Object gender = Gender.Femal;
+                Object gender = Gender.Female;
 
                 Assert.IsTrue(gender.GetType().IsEnum);
 
