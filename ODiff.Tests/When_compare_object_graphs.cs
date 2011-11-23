@@ -8,7 +8,7 @@ using ODiff.Tests.Utils;
 
 namespace ODiff.Tests
 {
-    public class Compare_two_objects
+    public class When_compare_object_graphs
     {
         [TestFixture]
         public class When_diff_objects_and_null
