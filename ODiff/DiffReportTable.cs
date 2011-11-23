@@ -21,10 +21,10 @@ namespace ODiff
 
         public IEnumerable<DiffReportTableRow> Rows
         {
-            get { return filterRows(); }
+            get { return FilterRows(); }
         }
 
-        private IEnumerable<DiffReportTableRow> filterRows()
+        private IEnumerable<DiffReportTableRow> FilterRows()
         {
             return rows.Where(row => filters.All(filter => filter.Include(row)));
         }
