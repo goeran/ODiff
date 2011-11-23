@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using ODiff.Interceptors;
 using ODiff.Tests.Fakes;
 using ODiff.Tests.Utils;
 

@@ -1,10 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ODiff
+namespace ODiff.Filters
 {
     public class RegexMemberPathExcludeFilter : IDiffFilter
     {
-        private Regex regex;
+        private readonly Regex regex;
 
         public RegexMemberPathExcludeFilter(string pattern)
         {

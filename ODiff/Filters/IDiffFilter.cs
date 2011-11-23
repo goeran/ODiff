@@ -1,4 +1,4 @@
-﻿namespace ODiff
+﻿namespace ODiff.Filters
 {
     public interface IDiffFilter
     {

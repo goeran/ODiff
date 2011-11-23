@@ -1,4 +1,4 @@
-﻿namespace ODiff
+﻿namespace ODiff.Interceptors
 {
     public interface INodeInterceptor
     {

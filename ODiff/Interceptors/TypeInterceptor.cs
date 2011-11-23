@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ODiff
+namespace ODiff.Interceptors
 {
     public class TypeInterceptor<T> : INodeInterceptor
     {

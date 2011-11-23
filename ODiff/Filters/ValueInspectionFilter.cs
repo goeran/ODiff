@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace ODiff
+namespace ODiff.Filters
 {
     public class ValueInspectionFilter<T> : IDiffFilter
     {
