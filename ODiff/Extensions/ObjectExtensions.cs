@@ -28,7 +28,11 @@ namespace ODiff.Extensions
 
         public static bool IsValueType(this object obj)
         {
-            return obj != null && (obj.GetType().IsPrimitive || obj.GetType() == typeof(decimal) || obj.GetType() == typeof(DateTime) || obj is string);
+            return obj != null && 
+                (obj.GetType().IsPrimitive || 
+                 obj is decimal || 
+                 obj is DateTime || 
+                 obj is string);
         }
 
         public static bool IsEnum(this object obj)
