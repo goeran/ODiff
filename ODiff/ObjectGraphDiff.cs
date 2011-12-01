@@ -13,6 +13,7 @@ namespace ODiff
         private readonly object rightRootNode;
         private readonly List<INodeInterceptor> nodeInterceptors = new List<INodeInterceptor>();
         private readonly DiffReport report;
+        private readonly HashSet<Object> visitedNodes = new HashSet<Object>();
 
         public ObjectGraphDiff(Object leftRootNode, Object rightRootNode, params INodeInterceptor[] interceptors)
         {
@@ -38,6 +39,8 @@ namespace ODiff
                 CompareLeafNode(memberPath, leftNode, rightNode);
                 return;
             }
+
+            CheckIfNodesHaveBeenVisited(leftNode, rightNode);
 
             VisitLeafNodes(memberPath, leftNode, rightNode);
         }
@@ -74,6 +77,27 @@ namespace ODiff
                 return leftValue.Equals(rightValue);
 
             return true;
+        }
+
+        private void CheckIfNodesHaveBeenVisited(object leftNode, object rightNode)
+        {
+            if (NodesAreVisited(leftNode, rightNode))
+            {
+                throw new Exception("It's not possible to diff graphs with cyclic dependencies");
+            }
+            MarkNodesAsVisited(leftNode, rightNode);
+        }
+
+        private bool NodesAreVisited(object leftNode, object rightNode)
+        {
+            return visitedNodes.Contains(leftNode) ||
+                   visitedNodes.Contains(rightNode);
+        }
+
+        private void MarkNodesAsVisited(object leftNode, object rightNode)
+        {
+            visitedNodes.Add(leftNode);
+            visitedNodes.Add(rightNode);
         }
 
         private void VisitLeafNodes(string memberPath, object leftNode, object rightNode)

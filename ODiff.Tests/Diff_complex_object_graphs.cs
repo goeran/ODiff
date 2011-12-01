@@ -191,6 +191,51 @@ namespace ODiff.Tests
         }
 
         [TestFixture]
+        public class When_diff_unequal_child_objects
+        {
+            [Test]
+            public void It_will_report_diff_on_object_properties()
+            {
+                var left = new Person
+                {
+                    Children = new List<Person>
+                    {
+                        new Person { NameProperty = "Steve" }
+                    }
+                };
+                var right = new Person
+                {
+                    Children = new List<Person>
+                    {
+                        new Person { NameProperty = "Bill" }                  
+                    }
+                };
+
+                var diff = Diff.ObjectValues(left, right);
+
+                Assert.AreEqual(1, diff.Table.Rows.Count());
+                Assert.AreEqual("Children[0].NameProperty", diff.Table[0].MemberPath);
+            }
+        }
+
+        [TestFixture]
+        public class When_diff_graphs_with_cyclic_dependencies
+        {
+            [Test]
+            [ExpectedException(typeof(Exception), ExpectedMessage = "It's not possible to diff graphs with cyclic dependencies")]
+            public void It_will_throw_exception_to_say_its_currently_not_possible()
+            {
+                var left = new Person { Children = new List<Person>() };
+                left.Children.Add(left);
+                var right = new Person { Children = new List<Person>() };
+                right.Children.Add(right);
+
+                Diff.ObjectValues(left, right);
+            }
+ 
+        }
+
+        [TestFixture]
         public class When_diff_equal_objects
         {
             [Test]
