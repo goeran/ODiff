@@ -4,7 +4,7 @@ using ODiff.Tests.Fakes;
 
 namespace ODiff.Tests
 {
-    class When_compare_values
+    class Diff_primitive_values
     {
         [TestFixture]
         public class When_compare_with_nulls
