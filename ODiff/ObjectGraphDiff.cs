@@ -40,7 +40,7 @@ namespace ODiff
                 return;
             }
 
-            CheckIfNodesHaveBeenVisited(leftNode, rightNode);
+            CheckIfNodesHaveBeenVisited(memberPath, leftNode, rightNode);
 
             VisitLeafNodes(memberPath, leftNode, rightNode);
         }
@@ -79,11 +79,14 @@ namespace ODiff
             return true;
         }
 
-        private void CheckIfNodesHaveBeenVisited(object leftNode, object rightNode)
+        private void CheckIfNodesHaveBeenVisited(string memberPath, object leftNode, object rightNode)
         {
             if (NodesAreVisited(leftNode, rightNode))
             {
-                throw new Exception("It's not possible to diff graphs with cyclic dependencies");
+                var message = String.Format(
+                    "It's not possible to diff graphs with cyclic dependencies. Found in: {0}",
+                    memberPath);
+                throw new Exception(message);
             }
             MarkNodesAsVisited(leftNode, rightNode);
         }

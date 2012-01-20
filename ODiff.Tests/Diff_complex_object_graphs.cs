@@ -222,7 +222,8 @@ namespace ODiff.Tests
         public class When_diff_graphs_with_cyclic_dependencies
         {
             [Test]
-            [ExpectedException(typeof(Exception), ExpectedMessage = "It's not possible to diff graphs with cyclic dependencies")]
+            [ExpectedException(typeof(Exception), 
+                ExpectedMessage = "It's not possible to diff graphs with cyclic dependencies. Found in: Children[0]")]
             public void It_will_throw_exception_to_say_its_currently_not_possible()
             {
                 var left = new Person { Children = new List<Person>() };
