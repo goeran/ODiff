@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ODiff")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Simple tool to diff object graphs.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Software Craftsman Gøran Hansen")]
 [assembly: AssemblyProduct("ODiff")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
