@@ -249,5 +249,34 @@ namespace ODiff.Tests
                 Assert.IsFalse(report.DiffFound);
             }
         }
+
+        [TestFixture]
+        public class When_diff_object_of_different_types
+        {
+            [Test]
+            public void It_will_rapport_diff()
+            {
+                var left = new Buss {Brand = "Mercedes Benz", Capacity = 22};
+                var right = new Car {Brand = "Mercedes Benz"};
+
+                var report = Diff.ObjectValues(left, right);
+                Console.WriteLine(report.Print());
+
+                Assert.AreEqual(1, report.Table.Rows.Count());
+                Assert.AreEqual("Capacity", report.Table.Rows.ElementAt(0).MemberPath);
+            }
+
+            class Car
+            {
+                public string Brand { get; set; } 
+            }
+
+            class Buss
+            {
+                public string Brand { get; set; }
+                public int Capacity { get; set; }
+            }
+        }
+
     }
 }

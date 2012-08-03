@@ -20,5 +20,10 @@ namespace ODiff.Extensions
         {
             return property.GetType() is IEnumerable;
         }
+
+        public static bool Exists(this PropertyInfo property)
+        {
+            return property is PropertyInfo;
+        }
     }
 }

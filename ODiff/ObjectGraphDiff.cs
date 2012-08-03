@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ODiff.Extensions;
 using ODiff.Interceptors;
 
@@ -165,18 +166,35 @@ namespace ODiff
             var leftGetterProps = leftObject.PublicGetterProperties();
             var rightGetterProps = rightObject.PublicGetterProperties();
 
+            Func<PropertyInfo[], int, PropertyInfo> tryGetProperty = (properties, index) =>
+            {
+                if (index < properties.Length) return properties[index];
+                return null;
+            };
+
             for (var i = 0; i < leftGetterProps.Length; i++)
             {
-                var leftProperty = leftGetterProps[i];
-                var rightProperty = rightGetterProps[i];
+                var leftProperty = tryGetProperty(leftGetterProps, i);
+                var rightProperty = tryGetProperty(rightGetterProps, i);
 
-                if (!leftProperty.IsIndexerProperty() &&
+                if (!leftProperty.Exists() && rightProperty.Exists())
+                {
+                    var newMemberPath = NewPath(currentMemberPath, rightProperty.Name);
+                    var rightValue = rightProperty.GetValue(rightObject);
+                    VisitNode(newMemberPath, null, rightValue);
+                }
+                else if (leftProperty.Exists() && !rightProperty.Exists())
+                {
+                    var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
+                    var leftValue = leftProperty.GetValue(leftObject);
+                    VisitNode(newMemberPath, leftValue, null);
+                }
+                else if (!leftProperty.IsIndexerProperty() &&
                     !rightProperty.IsIndexerProperty())
                 {
                     var leftValue = leftProperty.GetValue(leftObject);
                     var rightValue = rightProperty.GetValue(rightObject);
                     var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
-
                     VisitNode(newMemberPath, leftValue, rightValue);
                 }
             }
