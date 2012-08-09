@@ -193,9 +193,7 @@ namespace ODiff
             var leftGetterProps = leftObject.PublicGetterProperties();
             var rightGetterProps = rightObject.PublicGetterProperties();
 
-            var numberOfProperties = leftGetterProps.Length > rightGetterProps.Length
-                                         ? leftGetterProps.Length
-                                         : rightGetterProps.Length;
+            var numberOfProperties = Math.Max(leftGetterProps.Length, rightGetterProps.Length);
 
             for (var i = 0; i < numberOfProperties; i++)
             {
