@@ -200,25 +200,34 @@ namespace ODiff
                 var leftProperty = TryGetElementAtIndex(leftGetterProps, i);
                 var rightProperty = TryGetElementAtIndex(rightGetterProps, i);
 
-                if (!leftProperty.Exists() && rightProperty.Exists())
+                //TODO: find a better design for exceptions in diffing.
+                //The reasons the SyncRoot property is ignored on Arrays is because
+                //Arrays are a commonly used data structured, and SyncRoot is used
+                //when arrays provides their own synchronization, which I think
+                //is an edge case usage.
+                if (!(leftObject is Array && leftProperty.Name == "SyncRoot") ||
+                    !(rightObject is Array && rightProperty.Name == "SyncRoot"))
                 {
-                    var newMemberPath = NewPath(currentMemberPath, rightProperty.Name);
-                    var rightValue = rightProperty.GetValue(rightObject);
-                    VisitNode(newMemberPath, null, rightValue);
-                }
-                else if (leftProperty.Exists() && !rightProperty.Exists())
-                {
-                    var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
-                    var leftValue = leftProperty.GetValue(leftObject);
-                    VisitNode(newMemberPath, leftValue, null);
-                }
-                else if (!leftProperty.IsIndexerProperty() &&
-                    !rightProperty.IsIndexerProperty())
-                {
-                    var leftValue = leftProperty.GetValue(leftObject);
-                    var rightValue = rightProperty.GetValue(rightObject);
-                    var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
-                    VisitNode(newMemberPath, leftValue, rightValue);
+                    if (!leftProperty.Exists() && rightProperty.Exists())
+                    {
+                        var newMemberPath = NewPath(currentMemberPath, rightProperty.Name);
+                        var rightValue = rightProperty.GetValue(rightObject);
+                        VisitNode(newMemberPath, null, rightValue);
+                    }
+                    else if (leftProperty.Exists() && !rightProperty.Exists())
+                    {
+                        var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
+                        var leftValue = leftProperty.GetValue(leftObject);
+                        VisitNode(newMemberPath, leftValue, null);
+                    }
+                    else if (!leftProperty.IsIndexerProperty() &&
+                        !rightProperty.IsIndexerProperty())
+                    {
+                        var leftValue = leftProperty.GetValue(leftObject);
+                        var rightValue = rightProperty.GetValue(rightObject);
+                        var newMemberPath = NewPath(currentMemberPath, leftProperty.Name);
+                        VisitNode(newMemberPath, leftValue, rightValue);
+                    }
                 }
             }
         }
