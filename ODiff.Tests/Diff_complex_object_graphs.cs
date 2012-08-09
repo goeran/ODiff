@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using ODiff.Interceptors;
 using ODiff.Tests.Fakes;
 using ODiff.Tests.Utils;
 
@@ -20,6 +19,7 @@ namespace ODiff.Tests
                 var b = new Person { NameProperty = "Gøran Hansen" };
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
@@ -29,28 +29,34 @@ namespace ODiff.Tests
                 var b = new Person { NameField = "Bill" };
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_diff_on_public_decimal_properties()
             {
-                var a = new Person { HeightProperty = 1.8m };
-                var b = new Person { HeightProperty = 2.10m };
+                var personA = new Person {HeightProperty = 1.8m};
+                var personB = new Person {HeightProperty = 2.10m};
 
-                var diff = Diff.ObjectValues(a, b);
-                Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("HeightProperty", diff.Table[0].MemberPath);
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                    Assert.AreEqual("HeightProperty", diff.Table[0].MemberPath);
+                });
             }
 
             [Test]
             public void It_will_report_diff_on_public_decimal_fields()
             {
-                var a = new Person { HeightField = 1.8m };
-                var b = new Person { HeightField = 2.10m };
-
-                var diff = Diff.ObjectValues(a, b);
-                Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("HeightField", diff.Table[0].MemberPath);
+                var personA = new Person {HeightField = 1.8m};
+                var personB = new Person {HeightField = 2.10m};
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                    Assert.AreEqual("HeightField", diff.Table[0].MemberPath);
+                });
             }
 
             [Test]
@@ -60,78 +66,91 @@ namespace ODiff.Tests
                 var b = new Person { AgeField = 29 };
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_diff_on_public_int_properties()
             {
-                var left = new Person { AgeProperty = 20 };
-                var right = new Person { AgeProperty = 29 };
+                var a = new Person { AgeProperty = 20 };
+                var b = new Person { AgeProperty = 29 };
 
-                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_diff_on_public_float_properties()
             {
-                var left = new Person { WeightProperty = 80 };
-                var right = new Person { WeightProperty = 81 };
+                var a = new Person { WeightProperty = 80 };
+                var b = new Person { WeightProperty = 81 };
 
-                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_diff_on_public_float_field()
             {
-                var left = new Person { WeightField = 70 };
-                var right = new Person { WeightField = 81 };
+                var a = new Person { WeightField = 70 };
+                var b = new Person { WeightField = 81 };
 
-                Assert.IsTrue(Diff.ObjectValues(left, right).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_diff_on_public_Enum_properties()
             {
-                var left = new Person { GenderProperty = Gender.Female };
-                var right = new Person { GenderProperty = Gender.Male };
-
-                var report = Diff.ObjectValues(left, right);
-                Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("GenderProperty", report.Table[0].MemberPath);
+                Cross.diff(
+                    left: new Person { GenderProperty = Gender.Female },
+                    right: new Person { GenderProperty = Gender.Male },
+                    assert: (left, right) =>
+                    {
+                        var report = Diff.ObjectValues(left, right);
+                        Assert.IsTrue(report.DiffFound);
+                        Assert.AreEqual(1, report.Table.Rows.Count());
+                        Assert.AreEqual("GenderProperty", report.Table[0].MemberPath);
+                    }
+                );
             }
 
             [Test]
             public void It_will_report_diff_on_public_Enum_fields()
             {
-                var left = new Person { GenderField = Gender.Female };
-                var right = new Person { GenderField = Gender.Male };
-
-                var report = Diff.ObjectValues(left, right);
-                Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("GenderField", report.Table[0].MemberPath);
-
+                var personA = new Person {GenderField = Gender.Female};
+                var personB = new Person {GenderField = Gender.Male};
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var report = Diff.ObjectValues(left, right);
+                    Assert.IsTrue(report.DiffFound);
+                    Assert.AreEqual(1, report.Table.Rows.Count());
+                    Assert.AreEqual("GenderField", report.Table[0].MemberPath);
+                });
             }
 
             [Test]
             public void It_will_report_diff_on_public_DateTime_properties()
             {
-                var left = new Person { BornProperty = new DateTime(1981, 10, 10) };
-                var right = new Person { BornProperty = new DateTime(1981, 10, 11) };
-
-                var diff = Diff.ObjectValues(left, right);
-                Assert.AreEqual(1, diff.Table.Rows.Count());
+                var personA = new Person {BornProperty = new DateTime(1981, 10, 10)};
+                var personB = new Person {BornProperty = new DateTime(1981, 10, 11)};
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                });
             }
 
             [Test]
             public void It_will_report_diff_on_public_DateTime_fields()
             {
-                var left = new Person { BornField = new DateTime(1981, 10, 10) };
-                var right = new Person { BornField = new DateTime(1982, 10, 10) };
-
-                var diff = Diff.ObjectValues(left, right);
-                Assert.AreEqual(1, diff.Table.Rows.Count());
+                var personA = new Person {BornField = new DateTime(1981, 10, 10)};
+                var personB = new Person {BornField = new DateTime(1982, 10, 10)};
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                });
             }
 
             [Test]
@@ -141,52 +160,41 @@ namespace ODiff.Tests
                 var b = new Person { Children = new List<Person>() };
 
                 Assert.IsFalse(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsFalse(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
-            public void It_will_report_diff_on_object_references_when_left_is_null()
-            {
-                var a = new Person();
-                var b = new Person { Children = new List<Person>() };
-
-                Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
-            }
-
-            [Test]
-            public void It_will_report_diff_on_object_references_when_right_is_null()
+            public void It_will_report_diff_on_object_when_one_of_the_sides_are_null()
             {
                 var a = new Person { Children = new List<Person>() };
                 var b = new Person();
 
                 Assert.IsTrue(Diff.ObjectValues(a, b).DiffFound);
+                Assert.IsTrue(Diff.ObjectValues(b, a).DiffFound);
             }
 
             [Test]
             public void It_will_report_multiple_diffs()
             {
-                var left = new Person
+                var personA = new Person
                 {
-                    NameProperty = "Gøran",
-                    AgeProperty = 29,
-                    NameField = "Hansen",
-                    AgeField = 31
+                    NameProperty = "Gøran", AgeProperty = 29, NameField = "Hansen", AgeField = 31
                 };
-                var right = new Person
+                var personB = new Person
                 {
-                    NameProperty = "Gøran Hansen",
-                    AgeProperty = 30,
-                    NameField = "Mr Hansen",
-                    AgeField = 32
+                    NameProperty = "Gøran Hansen", AgeProperty = 30, NameField = "Mr Hansen", AgeField = 32
                 };
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var report = Diff.ObjectValues(left, right);
 
-                var report = Diff.ObjectValues(left, right);
-
-                Assert.IsTrue(report.DiffFound);
-                Assert.AreEqual(4, report.Table.Rows.Count());
-                Assert.AreEqual("NameField", report.Table[0].MemberPath);
-                Assert.AreEqual("AgeField", report.Table[1].MemberPath);
-                Assert.AreEqual("NameProperty", report.Table[2].MemberPath);
-                Assert.AreEqual("AgeProperty", report.Table[3].MemberPath);
+                    Assert.IsTrue(report.DiffFound);
+                    Assert.AreEqual(4, report.Table.Rows.Count());
+                    Assert.AreEqual("NameField", report.Table[0].MemberPath);
+                    Assert.AreEqual("AgeField", report.Table[1].MemberPath);
+                    Assert.AreEqual("NameProperty", report.Table[2].MemberPath);
+                    Assert.AreEqual("AgeProperty", report.Table[3].MemberPath);
+                });
             }
         }
 
@@ -196,14 +204,15 @@ namespace ODiff.Tests
             [Test]
             public void It_will_report_diff_on_object_properties()
             {
-                var left = new Person
+                var personA = new Person
                 {
                     Children = new List<Person>
                     {
                         new Person { NameProperty = "Steve" }
                     }
                 };
-                var right = new Person
+
+                var personB = new Person
                 {
                     Children = new List<Person>
                     {
@@ -211,10 +220,12 @@ namespace ODiff.Tests
                     }
                 };
 
-                var diff = Diff.ObjectValues(left, right);
-
-                Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("Children[0].NameProperty", diff.Table[0].MemberPath);
+                Cross.diff(personA, personB, (left, right) =>
+                {
+                    var diffResult = Diff.ObjectValues(left, right);
+                    Assert.AreEqual(1, diffResult.Table.Rows.Count());
+                    Assert.AreEqual("Children[0].NameProperty", diffResult.Table[0].MemberPath);
+                });
             }
         }
 
@@ -242,11 +253,14 @@ namespace ODiff.Tests
             [Test]
             public void It_will_not_report_diff()
             {
-                var steve = FakeData.KnownPersons.SteveJobs;
-                var steveExactCopy = ObjectCloner.Clone(steve);
+                var steveJobs = FakeData.KnownPersons.SteveJobs;
+                var clonedSteveJobs = ObjectCloner.Clone(steveJobs);
 
-                var report = Diff.ObjectValues(steve, steveExactCopy);
-                Assert.IsFalse(report.DiffFound);
+                Cross.diff(steveJobs, clonedSteveJobs, (left, right) =>
+                {
+                    var report = Diff.ObjectValues(left, right);
+                    Assert.IsFalse(report.DiffFound);
+                });
             }
         }
 
@@ -256,30 +270,27 @@ namespace ODiff.Tests
             [Test]
             public void It_will_rapport_diff_on_Properties()
             {
-                var left = new Buss {Brand = "Mercedes Benz", Capacity = 22};
-                var right = new Car {Brand = "Mercedes Benz"};
+                var vehicleA = new Buss {BrandProperty = "Mercedes Benz", CapacityProperty = 22};
+                var vehicleB = new Car {BrandProperty = "Mercedes Benz"};
 
-                Action<object, object> diffAndAssert = (a, b) =>
+                Cross.diff(vehicleA, vehicleB, (left, right) =>
                 {
                     var report = Diff.ObjectValues(left, right);
                     Console.WriteLine(report.Print());
                     Assert.AreEqual(1, report.Table.Rows.Count());
-                    Assert.AreEqual("Capacity", report.Table.Rows.ElementAt(0).MemberPath);
-                };
-
-                diffAndAssert(left, right);
-                diffAndAssert(right, left);
+                    Assert.AreEqual("CapacityProperty", report.Table.Rows.ElementAt(0).MemberPath);
+                });
             }
 
             class Car
             {
-                public string Brand { get; set; } 
+                public string BrandProperty { get; set; }
             }
 
             class Buss
             {
-                public string Brand { get; set; }
-                public int Capacity { get; set; }
+                public string BrandProperty { get; set; }
+                public int CapacityProperty { get; set; }
             }
         }
 

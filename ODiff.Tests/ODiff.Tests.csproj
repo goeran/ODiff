@@ -84,6 +84,7 @@
     <Compile Include="Diff_complex_object_graphs.cs" />
     <Compile Include="DiffReportTableTests.cs" />
     <Compile Include="Diff_structs.cs" />
+    <Compile Include="DSL.cs" />
     <Compile Include="Fakes\FakeData.cs" />
     <Compile Include="Fakes\Gender.cs" />
     <Compile Include="Fakes\Group.cs" />
