@@ -15,12 +15,13 @@ namespace ODiff.Tests
             [Test]
             public void It_can_intercept_based_on_member_path()
             {
-                var interceptor = new MemberPathInterceptor<string>("^NameField$",
-                                                                    input => input.ToUpper());
+                var interceptor = new MemberPathInterceptor<string>(
+                    "^NameField$",
+                    input => input.ToUpper());
+                var personA = new Person { NameField = "Gøran", NameProperty = "Gøran" };
+                var personB = new Person { NameField = "Torkild", NameProperty = "Torkild" };
 
-                var left = new Person { NameField = "Gøran", NameProperty = "Gøran" };
-                var right = new Person { NameField = "Torkild", NameProperty = "Torkild" };
-                var diff = Diff.ObjectValues(left, right, interceptor);
+                var diff = Diff.ObjectValues(personA, personB, interceptor);
 
                 Assert.AreEqual("GØRAN", diff.Table[0].LeftValue);
                 Assert.AreEqual("TORKILD", diff.Table[0].RightValue);
@@ -31,13 +32,13 @@ namespace ODiff.Tests
             [Test]
             public void It_will_not_intercept_invalid_type_when_intercept_by_member_path()
             {
-                var interceptor = new MemberPathInterceptor<int>("^NameField$",
-                                                                 input => input + 10);
+                var interceptor = new MemberPathInterceptor<int>(
+                    "^NameField$",
+                    input => input + 10);
+                var personA = new Person { NameField = "Gøran", NameProperty = "Gøran" };
+                var personB = new Person { NameField = "Torkild", NameProperty = "Torkild" };
 
-                var left = new Person { NameField = "Gøran", NameProperty = "Gøran" };
-                var right = new Person { NameField = "Torkild", NameProperty = "Torkild" };
-
-                var diff = Diff.ObjectValues(left, right, interceptor);
+                var diff = Diff.ObjectValues(personA, personB, interceptor);
 
                 Assert.AreEqual(2, diff.Table.Rows.Count());
             }
@@ -46,11 +47,11 @@ namespace ODiff.Tests
             public void It_can_intercept_on_node_type()
             {
                 var interceptor = new TypeInterceptor<int>(input => input + 1);
+                var personA = new Person { NameField = "Gøran", WeightField = 70, AgeField = 20, AgeProperty = 20 };
+                var personB = new Person { NameField = "Torkild", WeightField = 80, AgeField = 30, AgeProperty = 30 };
 
-                var left = new Person { NameField = "Gøran", WeightField = 70, AgeField = 20, AgeProperty = 20 };
-                var right = new Person { NameField = "Torkild", WeightField = 80, AgeField = 30, AgeProperty = 30 };
+                var diff = Diff.ObjectValues(personA, personB, interceptor);
 
-                var diff = Diff.ObjectValues(left, right, interceptor);
                 Assert.AreEqual(4, diff.Table.Rows.Count());
                 Assert.AreEqual("Gøran", diff.Table[0].LeftValue);
                 Assert.AreEqual("Torkild", diff.Table[0].RightValue);
@@ -70,22 +71,22 @@ namespace ODiff.Tests
                 Person right = null;
 
                 Measure("Building test set:", () =>
-                                                  {
-                                                      left = new Person();
-                                                      Generations(generations, left);
-                                                      right = new Person();
-                                                      Generations(generations, right);
-                                                  });
+                {
+                    left = new Person();
+                    Generations(generations, left);
+                    right = new Person();
+                    Generations(generations, right);
+                });
 
                 Measure("Diff", () =>
-                                    {
-                                        var diff = Diff.ObjectValues(left, right, new TypeInterceptor<string>(input =>
-                                                                                                                  {
-                                                                                                                      return input;
-                                                                                                                  }));
+                {
+                    var diff = Diff.ObjectValues(left, right, new TypeInterceptor<string>(input =>
+                    {
+                        return input;
+                    }));
 
-                                        Assert.AreEqual(0, diff.Table.Rows.Count());
-                                    });
+                    Assert.AreEqual(0, diff.Table.Rows.Count());
+                });
             }
 
             [Test]
@@ -98,10 +99,10 @@ namespace ODiff.Tests
 
                 var numberOfInterceptions = 0;
                 var listInterceptor = new TypeInterceptor<IEnumerable<Person>>(input =>
-                                                                                   {
-                                                                                       numberOfInterceptions++;
-                                                                                       return input;
-                                                                                   });
+                {
+                    numberOfInterceptions++;
+                    return input;
+                });
 
                 Diff.ObjectValues(left, right, listInterceptor);
                 Assert.AreEqual(2, numberOfInterceptions);
