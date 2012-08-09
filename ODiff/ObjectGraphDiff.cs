@@ -172,7 +172,11 @@ namespace ODiff
                 return null;
             };
 
-            for (var i = 0; i < leftGetterProps.Length; i++)
+            var numberOfProperties = leftGetterProps.Length > rightGetterProps.Length
+                                         ? leftGetterProps.Length
+                                         : rightGetterProps.Length;
+
+            for (var i = 0; i < numberOfProperties; i++)
             {
                 var leftProperty = tryGetProperty(leftGetterProps, i);
                 var rightProperty = tryGetProperty(rightGetterProps, i);

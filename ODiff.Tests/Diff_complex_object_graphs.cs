@@ -254,16 +254,21 @@ namespace ODiff.Tests
         public class When_diff_object_of_different_types
         {
             [Test]
-            public void It_will_rapport_diff()
+            public void It_will_rapport_diff_on_Properties()
             {
                 var left = new Buss {Brand = "Mercedes Benz", Capacity = 22};
                 var right = new Car {Brand = "Mercedes Benz"};
 
-                var report = Diff.ObjectValues(left, right);
-                Console.WriteLine(report.Print());
+                Action<object, object> diffAndAssert = (a, b) =>
+                {
+                    var report = Diff.ObjectValues(left, right);
+                    Console.WriteLine(report.Print());
+                    Assert.AreEqual(1, report.Table.Rows.Count());
+                    Assert.AreEqual("Capacity", report.Table.Rows.ElementAt(0).MemberPath);
+                };
 
-                Assert.AreEqual(1, report.Table.Rows.Count());
-                Assert.AreEqual("Capacity", report.Table.Rows.ElementAt(0).MemberPath);
+                diffAndAssert(left, right);
+                diffAndAssert(right, left);
             }
 
             class Car
