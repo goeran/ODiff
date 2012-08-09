@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Diff.cs" />
     <Compile Include="DiffReport.cs" />
+    <Compile Include="Extensions\FieldInfoExtentions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Filters\IDiffFilter.cs" />
     <Compile Include="Interceptors\INodeInterceptor.cs" />

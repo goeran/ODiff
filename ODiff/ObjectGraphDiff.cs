@@ -150,15 +150,42 @@ namespace ODiff
             var leftFields = leftObject.PublicFields();
             var rightFields = rightObject.PublicFields();
 
-            for (var i = 0; i < leftFields.Length; i++)
-            {
-                var fieldName = leftFields[i].Name;
-                var leftValue = leftFields[i].GetValue(leftObject);
-                var rightValue = rightFields[i].GetValue(rightObject);
-                var newMemberPath = NewPath(currentMemberPath, fieldName);
+            var numberOfFields = Math.Max(leftFields.Count(), rightFields.Count());
 
+            for (var i = 0; i < numberOfFields; i++)
+            {
+                var leftField = TryGetElementAtIndex(leftFields, i);
+                var rightField = TryGetElementAtIndex(rightFields, i);
+
+                string fieldName;
+                Object leftValue = null;
+                Object rightValue = null;
+
+                if (leftField.Exists() && !rightField.Exists())
+                {
+                    fieldName = leftField.Name;
+                    leftValue = leftField.GetValue(leftObject);
+                }
+                else if (!leftField.Exists() && rightField.Exists())
+                {
+                    fieldName = rightField.Name;
+                    rightValue = rightField.GetValue(rightObject);
+                }
+                else
+                {
+                    fieldName = leftField.Name;
+                    leftValue = leftField.GetValue(leftObject);
+                    rightValue = rightField.GetValue(rightObject);
+                }
+                var newMemberPath = NewPath(currentMemberPath, fieldName);
                 VisitNode(newMemberPath, leftValue, rightValue);
             }
+        }
+
+        private T TryGetElementAtIndex<T>(T[] elements, int index)
+        {
+            if (index < elements.Length) return elements[index];
+            return default(T);
         }
 
         private void VisitPublicProperties(string currentMemberPath, object leftObject, object rightObject)
@@ -166,20 +193,14 @@ namespace ODiff
             var leftGetterProps = leftObject.PublicGetterProperties();
             var rightGetterProps = rightObject.PublicGetterProperties();
 
-            Func<PropertyInfo[], int, PropertyInfo> tryGetProperty = (properties, index) =>
-            {
-                if (index < properties.Length) return properties[index];
-                return null;
-            };
-
             var numberOfProperties = leftGetterProps.Length > rightGetterProps.Length
                                          ? leftGetterProps.Length
                                          : rightGetterProps.Length;
 
             for (var i = 0; i < numberOfProperties; i++)
             {
-                var leftProperty = tryGetProperty(leftGetterProps, i);
-                var rightProperty = tryGetProperty(rightGetterProps, i);
+                var leftProperty = TryGetElementAtIndex(leftGetterProps, i);
+                var rightProperty = TryGetElementAtIndex(rightGetterProps, i);
 
                 if (!leftProperty.Exists() && rightProperty.Exists())
                 {

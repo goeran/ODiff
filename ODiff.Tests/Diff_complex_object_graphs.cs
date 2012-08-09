@@ -277,20 +277,40 @@ namespace ODiff.Tests
                 {
                     var report = Diff.ObjectValues(left, right);
                     Console.WriteLine(report.Print());
-                    Assert.AreEqual(1, report.Table.Rows.Count());
-                    Assert.AreEqual("CapacityProperty", report.Table.Rows.ElementAt(0).MemberPath);
+                    Assert.AreEqual(2, report.Table.Rows.Count());
+                    Assert.AreEqual("CapacityField", report.Table.Rows.ElementAt(0).MemberPath);
+                    Assert.AreEqual("CapacityProperty", report.Table.Rows.ElementAt(1).MemberPath);
+                });
+            }
+
+            [Test]
+            public void It_will_rapport_diff_on_Fields()
+            {
+                var vehicleA = new Buss { BrandField = "Mercedes Benz", CapacityField = 22 };
+                var vehicleB = new Car { BrandField = "Mercedes Benz" };
+
+                Cross.diff(vehicleA, vehicleB, (left, right) =>
+                {
+                    var report = Diff.ObjectValues(left, right);
+                    Console.WriteLine(report.Print());
+                    Assert.AreEqual(2, report.Table.Rows.Count());
+                    Assert.AreEqual("CapacityField", report.Table.Rows.ElementAt(0).MemberPath);
+                    Assert.AreEqual("CapacityProperty", report.Table.Rows.ElementAt(1).MemberPath);
                 });
             }
 
             class Car
             {
                 public string BrandProperty { get; set; }
+                public string BrandField;
             }
 
             class Buss
             {
                 public string BrandProperty { get; set; }
                 public int CapacityProperty { get; set; }
+                public string BrandField;
+                public int CapacityField;
             }
         }
 
