@@ -11,25 +11,31 @@ namespace ODiff.Tests
             [Test]
             public void It_will_detect_diff_on_public_properties()
             {
-                var left = new Employee { Name = "Steve" };
-                var right = new Employee();
+                var employeeA = new Employee { Name = "Steve" };
+                var employeeB = new Employee();
 
-                var diff = Diff.ObjectValues(left, right);
+                Cross.diff(employeeA, employeeB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
 
-                Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("Name", diff.Table[0].MemberPath);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                    Assert.AreEqual("Name", diff.Table[0].MemberPath);
+                });
             }
 
             [Test]
             public void It_will_detect_diff_on_public_fields()
             {
-                var left = new Employee { Number = 1 };
-                var right = new Employee { Number = 2 };
+                var employeeA = new Employee { Number = 1 };
+                var employeeB = new Employee { Number = 2 };
 
-                var diff = Diff.ObjectValues(left, right);
+                Cross.diff(employeeA, employeeB, (left, right) =>
+                {
+                    var diff = Diff.ObjectValues(left, right);
 
-                Assert.AreEqual(1, diff.Table.Rows.Count());
-                Assert.AreEqual("Number", diff.Table[0].MemberPath);
+                    Assert.AreEqual(1, diff.Table.Rows.Count());
+                    Assert.AreEqual("Number", diff.Table[0].MemberPath);
+                });
             }
 
             struct Employee
