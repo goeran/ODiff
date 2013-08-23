@@ -1,14 +1,16 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODiff", "ODiff\ODiff.csproj", "{7B81E3DE-A5F4-4242-91F5-FF6E6570B2A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODiff.Tests", "ODiff.Tests\ODiff.Tests.csproj", "{49E12160-3FD4-4C3A-A291-DF70AE3D5E46}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{F01F657B-A0D2-4C93-9524-6ED09ABCB53C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{683FBAEB-3B46-44E4-9116-4692EF8565D4}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\ODiff.nuspec = nuget\ODiff.nuspec
+		build.proj = build.proj
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTool", "BuildTool\BuildTool.csproj", "{E439E468-284B-4D7E-9A90-402BE8E4A155}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{49E12160-3FD4-4C3A-A291-DF70AE3D5E46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49E12160-3FD4-4C3A-A291-DF70AE3D5E46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49E12160-3FD4-4C3A-A291-DF70AE3D5E46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E439E468-284B-4D7E-9A90-402BE8E4A155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E439E468-284B-4D7E-9A90-402BE8E4A155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E439E468-284B-4D7E-9A90-402BE8E4A155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E439E468-284B-4D7E-9A90-402BE8E4A155}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

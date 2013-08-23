@@ -1,0 +1,25 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="build ">
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <nugetVersion Condition="'$(nugetVersion)' == ''">0.1</nugetVersion>
+    <build-output>build-output</build-output>
+    <build-tool>..\BuildTool\bin\$(Configuration)\BuildTool.exe</build-tool>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <NugetContent Include="ODiff\bin\$(Configuration)\*.dll"/>
+  </ItemGroup>
+
+  <Target Name="build">
+    <MSBuild Projects="ODiff.sln" Targets="Rebuild"/>
+  </Target>
+
+  <Target Name="upload-nuget" DependsOnTargets="build">
+    <RemoveDir Directories="$(build-output)"/>
+    <MakeDir Directories="$(build-output)"/>
+    <Copy SourceFiles="@(NugetContent)" DestinationFolder="$(build-output)\lib\net35"/>
+    <Exec Command="$(build-tool) create-nuspec $(nugetVersion)" WorkingDirectory="$(build-output)"/>
+    <Exec Command="nuget pack ODiff.nuspec" WorkingDirectory="$(build-output)"/>
+    <Exec Command="nuget push ODiff.dll.$(nugetVersion).nupkg" WorkingDirectory="$(build-output)"/>
+  </Target>
+</Project>
