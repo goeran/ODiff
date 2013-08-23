@@ -55,7 +55,11 @@ namespace ODiff
 
         public void AssertNoDiffToBeFound()
         {
-            if (DiffFound) throw new Exception("Expected no diff, but diff found");
+            if (DiffFound)
+            {
+                Console.WriteLine(Print());
+                throw new Exception("Expected no diff, but diff found");
+            }
         }
 
         public void AssertDiffToBeFound()
