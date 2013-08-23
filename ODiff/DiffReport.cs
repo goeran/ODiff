@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using ODiff.Filters;
 
@@ -52,5 +53,14 @@ namespace ODiff
             table.SetFilter(newFilters);
         }
 
+        public void AssertNoDiffToBeFound()
+        {
+            if (DiffFound) throw new Exception("Expected no diff, but diff found");
+        }
+
+        public void AssertDiffToBeFound()
+        {
+            if (!DiffFound) throw new Exception("Expected diff to be found, but the objects are equal");
+        }
     }
 }

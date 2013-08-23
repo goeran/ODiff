@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asserting_diffs.cs" />
     <Compile Include="Diff_arrays.cs" />
     <Compile Include="Diff_complex_object_graphs.cs" />
     <Compile Include="DiffReportTableTests.cs" />
