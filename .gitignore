@@ -7,3 +7,4 @@ debug
 *.suo
 obj
 *.vspscc
+build-output
