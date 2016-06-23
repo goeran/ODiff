@@ -12,14 +12,16 @@ namespace ODiff
         private readonly object leftRootNode;
         private readonly object rightRootNode;
         private readonly List<INodeInterceptor> nodeInterceptors = new List<INodeInterceptor>();
+        private readonly DiffConfig config;
         private readonly DiffReport report;
         private readonly HashSet<Object> visitedNodes = new HashSet<Object>();
 
-        public ObjectGraphDiff(Object leftRootNode, Object rightRootNode, params INodeInterceptor[] interceptors)
+        public ObjectGraphDiff(Object leftRootNode, Object rightRootNode, DiffConfig config, params INodeInterceptor[] interceptors)
         {
             report = NoDiffFound();
             this.rightRootNode = rightRootNode;
             this.leftRootNode = leftRootNode;
+            this.config = config;
             nodeInterceptors.AddRange(interceptors);
         }
 
@@ -40,7 +42,8 @@ namespace ODiff
                 return;
             }
 
-            CheckIfNodesHaveBeenVisited(memberPath, leftNode, rightNode);
+            if ((config == null) || (!config.AllowCyclicGraph))
+                CheckIfNodesHaveBeenVisited(memberPath, leftNode, rightNode);
 
             VisitLeafNodes(memberPath, leftNode, rightNode);
         }

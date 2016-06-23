@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diff.cs" />
+    <Compile Include="DiffConfig.cs" />
     <Compile Include="DiffReport.cs" />
     <Compile Include="Extensions\FieldInfoExtentions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
